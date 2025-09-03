@@ -96,7 +96,7 @@ body {
 /* 🛍 Product Grid */
 .cards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 items per row */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* flexible for desktop */
   gap: var(--gap);
   margin-top: 1.5rem;
   padding-bottom: 2rem;
@@ -154,4 +154,18 @@ body {
   color: #777;
   background-color: var(--bg);
   margin-top: 3rem;
+}
+
+/* 📱 Mobile: force 2 items per row */
+@media (max-width: 768px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 📱 Extra small screens: stack into 1 column */
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
 }
