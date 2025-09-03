@@ -163,9 +163,3 @@ body {
   }
 }
 
-/* 📱 Extra small screens: stack into 1 column */
-@media (max-width: 480px) {
-  .cards {
-    grid-template-columns: 1fr;
-  }
-}
