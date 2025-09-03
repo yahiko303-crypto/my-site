@@ -1,3 +1,7 @@
+/* TEST: Make sure CSS is loading */
+body {
+  background-color: limegreen !important;
+}
 /* 🎨 Root Variables */
 :root {
   --max: 1200px;

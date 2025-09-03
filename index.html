@@ -32,39 +32,8 @@
   <section class="products">
     <div class="container">
       <div class="cards">
-        <div class="card">
-  <img src="https://images.unsplash.com/photo-1581291519195-ef11498d1cf5?auto=format&fit=crop&w=300&q=80" alt="Handmade Necklace">
-  <h3>Handmade Necklace</h3>
-  <p>$25.00</p>
-  <button class="btn">Add to Cart</button>
-</div>
-
-<div class="card">
-  <img src="https://images.unsplash.com/photo-1589923188900-3e6a1b0c1d02?auto=format&fit=crop&w=300&q=80" alt="Wooden Bowl">
-  <h3>Wooden Bowl</h3>
-  <p>$40.00</p>
-  <button class="btn">Add to Cart</button>
-</div>
-
-<div class="card">
-  <img src="https://images.unsplash.com/photo-1582719478184-8a7f5db5f6c0?auto=format&fit=crop&w=300&q=80" alt="Ceramic Mug">
-  <h3>Ceramic Mug</h3>
-  <p>$18.00</p>
-  <button class="btn">Add to Cart</button>
-</div>
-
-<div class="card">
-  <img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=300&q=80" alt="Custom Print">
-  <h3>Custom Print</h3>
-  <p>$30.00</p>
-  <button class="btn">Add to Cart</button>
-</div>
-
-<div class="card">
-  <img src="https://images.unsplash.com/photo-1611078481354-2a3e179ddc4e?auto=format&fit=crop&w=300&q=80" alt="Leather Wallet">
-  <h3>Leather Wallet</h3>
-  <p>$50.00</p>
-  <button class="btn">Add to Cart</button>
+        <div class="cards" id="product-grid">
+  <!-- JS will populate products here -->
 </div>
 
       </div>
@@ -77,6 +46,28 @@
       <p>&copy; 2025 MyShop. All rights reserved.</p>
     </div>
   </footer>
+
+<script>
+  // Fetch products.json and dynamically create product cards
+  fetch('products.json')
+    .then(res => res.json())
+    .then(products => {
+      const grid = document.getElementById('product-grid');
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>${product.price}</p>
+          <button class="btn">Add to Cart</button>
+        `;
+        grid.appendChild(card);
+      });
+    })
+    .catch(err => console.error("Failed to load products:", err));
+</script>
+
 
 </body>
 </html>
