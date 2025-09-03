@@ -1,6 +1,6 @@
 :root { --max: 1100px; --gap: 1rem; --brand: #111; }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; line-height: 1.6; color: #222; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; line-height: 1.6; color: #222; background-color: red; }
 .container { max-width: var(--max); margin: 0 auto; padding: 0 1rem; }
 
 .nav { display: flex; gap: 1rem; align-items: center; padding: 1rem 0; }
