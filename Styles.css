@@ -1,4 +1,4 @@
-/* Root Variables */
+/* 🎨 Root Variables */
 :root {
   --max: 1200px;
   --gap: 1rem;
@@ -7,9 +7,11 @@
   --bg: #f7f7f7;
   --card-bg: #fff;
   --border: #ddd;
+  --btn-bg: #ff6600;
+  --btn-text: #fff;
 }
 
-/* Global Styles */
+/* 🧩 Global Styles */
 * {
   box-sizing: border-box;
 }
@@ -28,13 +30,15 @@ body {
   padding: 0 1rem;
 }
 
-/* Header */
+/* 🌐 Header */
 .header {
   background-color: var(--bg);
   padding: 1rem 0;
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.header .container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
@@ -47,35 +51,51 @@ body {
   text-decoration: none;
 }
 
-.nav a {
-  margin-right: 1rem;
-  text-decoration: none;
-  color: var(--text);
-  font-weight: 500;
-}
-
 .search-bar {
-  flex: 1 1 200px;
-  max-width: 300px;
+  flex: 1 1 300px;
+  max-width: 400px;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
   border: 1px solid var(--border);
   outline: none;
 }
 
-/* Featured Products */
-.featured h2 {
-  margin-top: 2rem;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 600;
+/* 🏷 Categories */
+.categories {
+  background-color: #fff;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
+.categories .container {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.categories a {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  transition: background 0.2s;
+}
+
+.categories a:hover {
+  background-color: var(--brand);
+  color: var(--btn-text);
+}
+
+/* 🛍 Product Grid */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: var(--gap);
+  margin-top: 1.5rem;
+  padding-bottom: 2rem;
 }
 
 .card {
@@ -106,7 +126,22 @@ body {
   font-weight: bold;
 }
 
-/* Footer */
+.btn {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* 🦶 Footer */
 .footer {
   padding: 2rem 0;
   text-align: center;
