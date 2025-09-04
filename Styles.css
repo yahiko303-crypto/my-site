@@ -42,27 +42,19 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.header .container {
+.header .header-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-
-  /* <-- Add this for wrapping if logo is long */
-  flex-wrap: wrap;
+  flex-direction: column; /* stack logo and search */
+  align-items: center;   /* center everything */
+  gap: 0.5rem;
 }
 
 .logo {
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: var(--brand);
   text-decoration: none;
-
-  /* <-- Add this to prevent logo from stretching header */
-  max-width: 40%; /* adjust as needed */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;   /* prevent breaking into multiple lines */
 }
 
 .search-bar {
