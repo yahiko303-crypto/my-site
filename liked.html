@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Liked Items</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header-container">
+      <a href="index.html" class="logo">DjsDopeDesigns</a>
+      <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-left: 20px;">♥ Liked Items</a>
+    </div>
+  </header>
+
+  <!-- Liked Items Grid -->
+  <section class="products">
+    <div class="container">
+      <div class="cards" id="liked-grid"></div>
+    </div>
+  </section>
+
+  <script>
+    fetch('products.json')
+      .then(res => res.json())
+      .then(products => {
+        const likedIds = JSON.parse(localStorage.getItem("likedItems")) || [];
+        const grid = document.getElementById("liked-grid");
+        products
+          .filter(p => likedIds.includes(p.id))
+          .forEach(product => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <a href="product.html?id=${product.id}">
+                <img src="${product.image}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>$${(product.price/100).toFixed(2)}</p>
+              </a>
+            `;
+            grid.appendChild(card);
+          });
+      });
+  </script>
+
+</body>
+</html>

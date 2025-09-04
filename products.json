@@ -1,5 +1,5 @@
 [
-{"name":"Drake Dancing","price":"$3.50","image":"images/3drake-dancing.gif"},
+{"name":"Drake Dancing","price":"$3.50","image":"images/3drake-dancing.gif","description": "Drake doing the hotline."},
 {"name":"Hammer Girl","price":"$3.50","image":"images/2hammer-girl.gif"},
 {"name":"Dancing Guy","price":"$3.50","image":"images/4dancing-Guy.gif"},
 {"name":"Green Dancer","price":"$3.50","image":"images/5green-dancer.gif"},

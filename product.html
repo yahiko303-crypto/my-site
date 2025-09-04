@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Details</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f6f6f6;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      display: flex;
+      gap: 40px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      padding: 20px;
+    }
+
+    /* Left: Image */
+    .product-images {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .product-images img {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Right: Info */
+    .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .product-info h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .product-price {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 15px 0;
+      color: #111;
+    }
+
+    .btn {
+      font-size: 16px;
+      padding: 14px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px 10px 10px 0;
+      transition: 0.3s;
+      border: none;
+    }
+
+    .add-to-cart {
+      background: #f1641e;
+      color: white;
+    }
+
+    .add-to-cart:hover {
+      background: #d9550e;
+    }
+
+    .buy-now {
+      background: #111;
+      color: #fff;
+    }
+
+    .buy-now:hover {
+      background: #000;
+    }
+
+    .details {
+      max-width: 1200px;
+      margin: 20px auto 60px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .details h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .details p {
+      line-height: 1.6;
+      font-size: 16px;
+      color: #555;
+    }
+
+    a {
+      margin-top: 20px;
+      color: #0077cc;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🌐 Header Navigation -->
+  <header class="header">
+    <div class="container header-container">
+      <a href="index.html" class="logo">DjsDopeDesigns</a>
+      <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-left: 20px;">
+        ♥ Liked Items
+      </a>
+    </div>
+  </header>
+
+  <!-- Product Content -->
+  <div class="container">
+    <!-- LEFT: Image -->
+    <div class="product-images">
+  <div class="heart always" onclick="toggleLike(window.currentProduct.id, this)">♡</div>
+  <img id="product-image" src="" alt="Product Image">
+</div>
+
+    <!-- RIGHT: Info -->
+    <div class="product-info">
+      <h1 id="product-name"></h1>
+      <p class="product-price" id="product-price"></p>
+      <div>
+        <button class="btn add-to-cart" onclick="addToCart()">Add to Cart</button>
+        <button class="btn buy-now" onclick="buyNow()">Buy Now</button>
+      </div>
+      <a href="cart.html">Go to Cart</a>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="details">
+    <h2>Product Description</h2>
+    <p id="product-description"></p>
+  </div>
+
+  <script>
+    // Get product ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get("id");
+
+    // Fetch product data
+    fetch('products.json')
+      .then(res => res.json())
+      .then(products => {
+        const product = products.find(p => p.id == productId);
+        if (product) {
+          document.getElementById("product-name").textContent = product.name;
+          document.getElementById("product-image").src = product.image;
+          document.getElementById("product-price").textContent = "$" + (product.price / 100).toFixed(2);
+          document.getElementById("product-description").textContent = product.description;
+
+          // Store for cart/buy now
+          window.currentProduct = product;
+        }
+      });
+
+    // Add to Cart
+    function addToCart() {
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existing = cart.find(item => item.id == window.currentProduct.id);
+      if (existing) {
+        existing.quantity++;
+      } else {
+        cart.push({ id: window.currentProduct.id, name: window.currentProduct.name, price: window.currentProduct.price, quantity: 1 });
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert(window.currentProduct.name + " added to cart!");
+    }
+
+    // Buy Now (Stripe Checkout)
+    async function buyNow() {
+      const response = await fetch("http://localhost:4000/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: [{ id: window.currentProduct.id, name: window.currentProduct.name, price: window.currentProduct.price, quantity: 1 }]
+        })
+      });
+      const data = await response.json();
+      window.location = data.url;
+    }
+
+// ❤️ Heart Toggle Function
+    function toggleLike(productId, el) {
+      let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+      if (liked.includes(productId)) {
+        liked = liked.filter(id => id !== productId);
+        el.textContent = "♡";
+      } else {
+        liked.push(productId);
+        el.textContent = "♥";
+      }
+      localStorage.setItem("likedItems", JSON.stringify(liked));
+    }
+  </script>
+
+</body>
+</html>
