@@ -5,11 +5,13 @@
   <title>Product Details</title>
   <link rel="stylesheet" href="styles.css">
   <style>
+    /* 🌐 Global Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background: #f6f6f6;
       color: #333;
+      padding-top: 60px; /* space for fixed header */
     }
 
     .container {
@@ -192,37 +194,129 @@
       .checkout-wrapper { max-width: 100%; }
     }
 
+    /* 🌐 Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 8px 0;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      gap: 15px;
+    }
+
+    /* Left & Right Sections */
+    .header-left,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    /* Hamburger */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      display: block;
+      height: 3px;
+      width: 100%;
+      background-color: #111;
+      border-radius: 2px;
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #111;
+      flex-shrink: 0;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      flex: 1;
+      min-width: 120px;
+      max-width: 300px;
+      padding: 8px 12px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    /* Icons */
+    .liked-icon img,
+    .cart img {
+      width: 28px;
+      height: 28px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .header-left,
+      .header-right {
+        gap: 10px;
+      }
+      .search-bar {
+        min-width: 80px;
+        max-width: 150px;
+      }
+    }
+
   </style>
 </head>
 <body>
 
   <!-- Header Navigation -->
   <header class="header">
-  <div class="container header-container">
-    <!-- Hamburger Icon -->
-    <div class="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
+    <div class="container header-container">
+      <div class="header-left">
+        <!-- Hamburger Icon -->
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <!-- Logo -->
+        <a href="index.html" class="logo">DjsDopeDesigns</a>
+
+        <!-- Search Bar -->
+        <input type="text" class="search-bar" placeholder="Search products...">
+      </div>
+
+      <div class="header-right">
+        <!-- Heart / Liked Items -->
+        <a href="liked.html" class="liked-icon">
+          <img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items">
+        </a>
+
+        <!-- Shopping Cart Icon -->
+        <a href="cart.html" class="cart">
+          <img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart">
+        </a>
+      </div>
     </div>
-
-    <!-- Logo -->
-    <a href="index.html" class="logo">DjsDopeDesigns</a>
-
-    <!-- Search Bar -->
-    <input type="text" class="search-bar" placeholder="Search products...">
-
-    <!-- Heart / Liked Items -->
-  <a href="liked.html" class="liked-icon">
-    <img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items">
-  </a>
-
-    <!-- Shopping Cart Icon -->
-    <a href="cart.html" class="cart">
-      <img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart">
-    </a>
-  </div>
-</header>
+  </header>
 
   <!-- Product Content -->
   <div class="container">
@@ -311,7 +405,6 @@
       localStorage.setItem("likedItems", JSON.stringify(liked));
     }
 
-    // Payment icon change
     const paymentSelect = document.getElementById("payment-method");
     const checkoutIcon = document.getElementById("checkout-icon");
     paymentSelect.addEventListener("change", () => {
