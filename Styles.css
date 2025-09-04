@@ -47,6 +47,9 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+
+  /* <-- Add this for wrapping if logo is long */
+  flex-wrap: wrap;
 }
 
 .logo {
@@ -54,10 +57,16 @@ body {
   font-size: 1.5rem;
   color: var(--brand);
   text-decoration: none;
+
+  /* <-- Add this to prevent logo from stretching header */
+  max-width: 40%; /* adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .search-bar {
-  flex: 1 1 300px;
+  flex: 1 1 200px; /* search bar grows/shrinks nicely */
   max-width: 400px;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
