@@ -58,12 +58,13 @@ body {
 }
 
 .search-bar {
-  flex: 1 1 200px; /* search bar grows/shrinks nicely */
-  max-width: 400px;
-  padding: 0.5rem 1rem;
+  width: 250px;           /* fixed reasonable width */
+  padding: 0.4rem 0.8rem; /* smaller padding so it’s not too fat */
   border-radius: 2rem;
   border: 1px solid var(--border);
   outline: none;
+  display: block;         /* ensures it behaves like a block under logo */
+  margin: 0 auto;         /* keeps it centered */
 }
 
 /* 🏷 Categories */
