@@ -10,56 +10,44 @@ body {
   margin: 0;
   background: #f6f6f6;
   color: #333;
-  padding-top: 60px; /* header height */
 }
 a { text-decoration: none; color: inherit; }
 button { cursor: pointer; }
 
 /* Header */
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   background: #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  height: 50px;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  justify-content: space-between;
+  padding: 10px 16px;
+  position: sticky;
+  top: 0;
   z-index: 1000;
 }
-.header .logo { font-weight: bold; font-size: 18px; margin-right: 20px; }
-.header input { flex: 1; max-width: 250px; height: 30px; border: 1px solid #ccc; border-radius: 6px; padding: 0 10px; }
+.header .logo { font-weight: bold; font-size: 18px; }
+.header input {
+  flex: 1;
+  margin: 0 10px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 0 10px;
+}
 .header .icons { display: flex; gap: 15px; }
 .header .icons img { width: 28px; height: 28px; }
 
-/* Main container */
-.container {
-  display: flex;
-  max-width: 1200px;
-  margin: 40px auto;
-  gap: 40px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 20px;
-  flex-wrap: wrap;
-}
-
-/* Product image */
-.product-images {
-  flex: 1;
-  display: flex;
-  justify-content: center;
+/* Product Image */
+.product-image-wrapper {
   position: relative;
-  min-width: 300px;
-}
-.product-images img {
   width: 100%;
-  max-width: 500px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.product-image-wrapper img {
+  width: 100%;
+  display: block;
+  border-radius: 0;
 }
 .heart.always {
   position: absolute;
@@ -76,64 +64,71 @@ button { cursor: pointer; }
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-/* Product info */
+/* Product Info */
 .product-info {
-  flex: 1;
-  min-width: 280px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  padding: 16px;
 }
-.product-info h1 { font-size: 26px; margin-bottom: 10px; }
-.product-price { font-size: 22px; font-weight: bold; margin: 15px 0; color: #111; }
-.product-info button { background: #f1641e; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; margin-bottom: 10px; transition: 0.3s; }
-.product-info button:hover { background: #d9550e; }
+.product-price {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 10px 0;
+  color: #111;
+}
+.product-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
 
-/* Checkout options */
-.checkout-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.checkout-wrapper label { font-weight: bold; }
-.checkout-wrapper select {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-.checkout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+/* Buttons */
+.product-info button {
+  width: 100%;
   background: #f1641e;
   color: #fff;
   border: none;
   padding: 12px;
   border-radius: 6px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  transition: 0.3s;
+}
+.product-info button:hover {
+  background: #d9550e;
+}
+
+/* Checkout select */
+.checkout-wrapper select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
   font-size: 14px;
+}
+.checkout-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background: #f1641e;
+  color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  width: 100%;
+  font-size: 16px;
 }
 .checkout-btn img { width: 22px; height: 22px; }
 .checkout-btn:hover { background: #d9550e; }
 
-/* Description */
+/* Product Description */
 .details {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
+  padding: 16px;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-top: 16px;
 }
-.details h2 { font-size: 20px; margin-bottom: 10px; }
+.details h2 { font-size: 18px; margin-bottom: 8px; }
 .details p { font-size: 14px; line-height: 1.6; color: #555; }
 
-/* Responsive */
-@media(max-width:768px){
-  .container { flex-direction: column; }
-  .header input { max-width: 150px; }
-}
 </style>
 </head>
 <body>
@@ -148,35 +143,33 @@ button { cursor: pointer; }
   </div>
 </header>
 
-<!-- Main product -->
-<div class="container">
-  <div class="product-images">
-    <div class="heart always" onclick="toggleLike(currentProduct.id, this)">♡</div>
-    <img id="product-image" src="" alt="Product Image">
-  </div>
-  <div class="product-info">
-    <h1 id="product-name"></h1>
-    <p class="product-price" id="product-price"></p>
-    <button onclick="addToCart()">Add to Cart</button>
+<!-- Product Image -->
+<div class="product-image-wrapper">
+  <div class="heart always" onclick="toggleLike(currentProduct.id, this)">♡</div>
+  <img id="product-image" src="" alt="Product Image">
+</div>
 
-    <div class="checkout-wrapper">
-      <label for="payment-method">Choose Payment Method:</label>
-      <select id="payment-method">
-        <option value="">-- Select Payment --</option>
-        <option value="stripe-card">Credit / Debit Card</option>
-        <option value="paypal">PayPal</option>
-        <option value="stripe-wallet">Google Pay / Apple Pay</option>
-      </select>
-      <button class="checkout-btn" onclick="checkoutProduct()">
-        <img id="checkout-icon" src="https://cdn-icons-png.flaticon.com/512/888/888879.png" alt="Pay Icon"> Buy Now
-      </button>
-    </div>
+<!-- Product Info -->
+<div class="product-info">
+  <p class="product-price" id="product-price"></p>
+  <h1 class="product-title" id="product-name"></h1>
 
-    <a href="cart.html">Go to Cart</a>
+  <button onclick="addToCart()">Add to Cart</button>
+
+  <div class="checkout-wrapper">
+    <select id="payment-method">
+      <option value="">-- Select Payment --</option>
+      <option value="stripe-card">Credit / Debit Card</option>
+      <option value="paypal">PayPal</option>
+      <option value="stripe-wallet">Google Pay / Apple Pay</option>
+    </select>
+    <button class="checkout-btn" onclick="checkoutProduct()">
+      <img id="checkout-icon" src="https://cdn-icons-png.flaticon.com/512/888/888879.png" alt="Pay Icon"> Buy Now
+    </button>
   </div>
 </div>
 
-<!-- Product Description -->
+<!-- Description -->
 <div class="details">
   <h2>Product Description</h2>
   <p id="product-description"></p>
@@ -191,39 +184,39 @@ fetch('products.json')
 .then(res => res.json())
 .then(products => {
   const product = products.find(p => p.id.toString() === productId);
-  if (product) {
+  if(product){
     currentProduct = product;
     document.getElementById("product-name").textContent = product.name;
     document.getElementById("product-image").src = product.image;
-    document.getElementById("product-price").textContent = "$" + (product.price / 100).toFixed(2);
+    document.getElementById("product-price").textContent = "$" + (product.price/100).toFixed(2);
     document.getElementById("product-description").textContent = product.description;
     const heartEl = document.querySelector(".heart");
     const liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-    if (liked.includes(product.id.toString())) heartEl.textContent = "♥";
+    if(liked.includes(product.id.toString())) heartEl.textContent="♥";
   }
 });
 
 function addToCart() {
   if(!currentProduct) return;
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(item => item.id.toString() === currentProduct.id.toString());
+  const existing = cart.find(item => item.id.toString()===currentProduct.id.toString());
   if(existing) existing.quantity++;
-  else cart.push({ id: currentProduct.id.toString(), name: currentProduct.name, price: currentProduct.price, quantity: 1 });
+  else cart.push({id: currentProduct.id.toString(), name: currentProduct.name, price: currentProduct.price, quantity:1});
   localStorage.setItem("cart", JSON.stringify(cart));
-  alert(currentProduct.name + " added to cart!");
+  alert(currentProduct.name+" added to cart!");
 }
 
 function toggleLike(productId, el){
   productId = productId.toString();
-  let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-  if(liked.includes(productId)){ liked = liked.filter(id => id!==productId); el.textContent="♡"; }
+  let liked = JSON.parse(localStorage.getItem("likedItems"))||[];
+  if(liked.includes(productId)){ liked = liked.filter(id=>id!==productId); el.textContent="♡"; }
   else { liked.push(productId); el.textContent="♥"; }
   localStorage.setItem("likedItems", JSON.stringify(liked));
 }
 
 const paymentSelect = document.getElementById("payment-method");
 const checkoutIcon = document.getElementById("checkout-icon");
-paymentSelect.addEventListener("change", () => {
+paymentSelect.addEventListener("change", ()=>{
   const val = paymentSelect.value;
   if(val==="paypal") checkoutIcon.src="https://cdn-icons-png.flaticon.com/512/888/888841.png";
   else if(val==="stripe-card") checkoutIcon.src="https://cdn-icons-png.flaticon.com/512/888/888879.png";
@@ -231,11 +224,11 @@ paymentSelect.addEventListener("change", () => {
   else checkoutIcon.src="https://cdn-icons-png.flaticon.com/512/888/888879.png";
 });
 
-async function checkoutProduct() {
+async function checkoutProduct(){
   if(!currentProduct) return;
   const method = paymentSelect.value;
   if(!method){ alert("Please select a payment method!"); return; }
-  // Payment logic (PayPal / Stripe)
+  // Payment logic
 }
 </script>
 </body>
