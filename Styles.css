@@ -84,12 +84,10 @@ body {
   font-size: 14px;
 }
 
-.liked-items {
-  color: #f1641e;
-  font-weight: bold;
-  font-size: 18px;
-  margin-left: 10px;
-  text-decoration: none;
+.liked-icon img {
+  width: 28px;
+  height: 28px;
+  margin-left: 10px; /* space after search bar */
   flex-shrink: 0;
 }
 
