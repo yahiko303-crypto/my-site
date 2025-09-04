@@ -1,0 +1,22 @@
+{
+  "name": "my-made-website",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yahiko303-crypto/my-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yahiko303-crypto/my-site/issues"
+  },
+  "homepage": "https://github.com/yahiko303-crypto/my-site#readme"
+}

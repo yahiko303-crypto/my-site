@@ -1,8 +1,3 @@
-/* TEST: Make sure CSS is loading */
-body {
-  background-color: limegreen !important;
-}
-
 /* 🎨 Root Variables */
 :root {
   --max: 1200px;
@@ -37,34 +32,82 @@ body {
 
 /* 🌐 Header */
 .header {
-  background-color: var(--bg);
-  padding: 1rem 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.header .header-container {
+.header-container {
   display: flex;
-  flex-direction: column; /* stack logo and search */
-  align-items: center;   /* center everything */
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 10px;
 }
 
 .logo {
+  font-size: 20px;
   font-weight: bold;
-  font-size: 1.8rem;
-  color: var(--brand);
   text-decoration: none;
-  white-space: nowrap;   /* prevent breaking into multiple lines */
+  color: #111;
+  flex-shrink: 0;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: #111;
+  border-radius: 2px;
 }
 
 .search-bar {
-  width: 250px;           /* fixed reasonable width */
-  padding: 0.4rem 0.8rem; /* smaller padding so it’s not too fat */
-  border-radius: 2rem;
-  border: 1px solid var(--border);
-  outline: none;
-  display: block;         /* ensures it behaves like a block under logo */
-  margin: 0 auto;         /* keeps it centered */
+  flex: 1;
+  min-width: 120px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.liked-items {
+  color: #f1641e;
+  font-weight: bold;
+  font-size: 18px;
+  margin-left: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.cart img {
+  width: 28px;
+  height: 28px;
+  margin-left: 10px;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-container {
+    gap: 6px;
+  }
+  .search-bar {
+    min-width: 80px;
+  }
 }
 
 /* 🏷 Categories */
