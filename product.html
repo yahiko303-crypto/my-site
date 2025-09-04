@@ -200,10 +200,10 @@
       top: 0;
       left: 0;
       width: 100%;
+      height: 50px;
       z-index: 1000;
       background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 8px 0;
     }
 
     .header-container {
@@ -213,10 +213,9 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 16px;
-      gap: 15px;
+      height: 100%;
     }
 
-    /* Left & Right Sections */
     .header-left,
     .header-right {
       display: flex;
@@ -244,7 +243,7 @@
 
     /* Logo */
     .logo {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       text-decoration: none;
       color: #111;
@@ -255,8 +254,8 @@
     .search-bar {
       flex: 1;
       min-width: 120px;
-      max-width: 300px;
-      padding: 8px 12px;
+      max-width: 250px;
+      padding: 6px 10px;
       height: 32px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -281,7 +280,6 @@
         max-width: 150px;
       }
     }
-
   </style>
 </head>
 <body>
@@ -375,7 +373,6 @@
           document.getElementById("product-price").textContent = "$" + (product.price / 100).toFixed(2);
           document.getElementById("product-description").textContent = product.description;
 
-          // Heart toggle
           const heartEl = document.querySelector(".heart");
           const liked = JSON.parse(localStorage.getItem("likedItems")) || [];
           if (liked.includes(product.id.toString())) heartEl.textContent = "♥";
