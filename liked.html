@@ -11,7 +11,20 @@
   <header class="header">
     <div class="container header-container">
       <a href="index.html" class="logo">DjsDopeDesigns</a>
-      <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-left: 20px;">♥ Liked Items</a>
+
+      <!-- ❤️ Liked Items Link -->
+      <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-left: 20px;">
+        ♥ Liked Items
+      </a>
+
+      <!-- 🛒 Cart Icon / Counter -->
+      <a href="cart.html" style="margin-left: 20px; font-weight: bold; position: relative;">
+        🛒 Cart
+        <span id="cart-count" 
+              style="background:#f1641e; color:#fff; font-size:12px; padding:2px 6px; border-radius:50%; position:absolute; top:-8px; right:-12px;">
+          0
+        </span>
+      </a>
     </div>
   </header>
 
@@ -22,28 +35,55 @@
     </div>
   </section>
 
-  <script>
-    fetch('products.json')
-      .then(res => res.json())
-      .then(products => {
-        const likedIds = JSON.parse(localStorage.getItem("likedItems")) || [];
-        const grid = document.getElementById("liked-grid");
-        products
-          .filter(p => likedIds.includes(p.id))
-          .forEach(product => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <a href="product.html?id=${product.id}">
-                <img src="${product.image}" alt="${product.name}">
-                <h3>${product.name}</h3>
-                <p>$${(product.price/100).toFixed(2)}</p>
-              </a>
-            `;
-            grid.appendChild(card);
-          });
-      });
-  </script>
+<script>
+  // Fetch products.json
+  fetch('products.json')
+    .then(res => res.json())
+    .then(products => {
+      const likedIds = JSON.parse(localStorage.getItem("likedItems")) || [];
+      const grid = document.getElementById("liked-grid");
+      products
+        .filter(p => likedIds.includes(p.id.toString()))
+        .forEach(product => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="heart" onclick="toggleLike(${product.id}, this)">♥</div>
+            <a href="product.html?id=${product.id}">
+              <img src="${product.image}" alt="${product.name}">
+              <h3>${product.name}</h3>
+              <p>$${(product.price/100).toFixed(2)}</p>
+            </a>
+          `;
+          grid.appendChild(card);
+        });
+    });
+
+  // Heart toggle
+  function toggleLike(productId, el) {
+    productId = productId.toString();
+    let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+    if (liked.includes(productId)) {
+      liked = liked.filter(id => id !== productId);
+      el.parentElement.remove(); // remove card from page
+    } else {
+      liked.push(productId);
+      el.textContent = "♥";
+    }
+    localStorage.setItem("likedItems", JSON.stringify(liked));
+  }
+
+  // Update live cart count
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const counter = document.getElementById("cart-count");
+    if (counter) counter.textContent = total;
+  }
+
+  // Initialize cart counter
+  updateCartCount();
+</script>
 
 </body>
 </html>

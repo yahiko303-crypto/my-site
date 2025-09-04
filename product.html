@@ -21,14 +21,16 @@
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.08);
       padding: 20px;
+      flex-wrap: wrap;
     }
 
-    /* Left: Image */
     .product-images {
       flex: 1;
       display: flex;
       align-items: flex-start;
       justify-content: center;
+      position: relative;
+      min-width: 300px;
     }
 
     .product-images img {
@@ -38,12 +40,28 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    /* Right: Info */
+    .heart.always {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
     .product-info {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      min-width: 280px;
     }
 
     .product-info h1 {
@@ -77,15 +95,6 @@
       background: #d9550e;
     }
 
-    .buy-now {
-      background: #111;
-      color: #fff;
-    }
-
-    .buy-now:hover {
-      background: #000;
-    }
-
     .details {
       max-width: 1200px;
       margin: 20px auto 60px;
@@ -116,11 +125,78 @@
     a:hover {
       text-decoration: underline;
     }
+
+    /* Etsy-style checkout dropdown wrapper */
+    .checkout-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+      max-width: 320px;
+    }
+
+    .checkout-label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    select#payment-method {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      appearance: none;
+      background-color: #fff;
+      background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M0 0l5 6 5-6z" fill="%23333"/%3E%3C/svg%3E');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 10px auto;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    select#payment-method:focus {
+      outline: none;
+      border-color: #f1641e;
+      box-shadow: 0 0 0 2px rgba(241,100,30,0.2);
+    }
+
+    .checkout-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #f1641e;
+      color: white;
+      padding: 14px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .checkout-btn:hover {
+      background: #d9550e;
+    }
+
+    .checkout-btn img {
+      width: 24px;
+      height: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .checkout-wrapper { max-width: 100%; }
+    }
+
   </style>
 </head>
 <body>
 
-<!-- 🌐 Header Navigation -->
+  <!-- Header Navigation -->
   <header class="header">
     <div class="container header-container">
       <a href="index.html" class="logo">DjsDopeDesigns</a>
@@ -134,9 +210,9 @@
   <div class="container">
     <!-- LEFT: Image -->
     <div class="product-images">
-  <div class="heart always" onclick="toggleLike(window.currentProduct.id, this)">♡</div>
-  <img id="product-image" src="" alt="Product Image">
-</div>
+      <div class="heart always" onclick="toggleLike(currentProduct.id, this)">♡</div>
+      <img id="product-image" src="" alt="Product Image">
+    </div>
 
     <!-- RIGHT: Info -->
     <div class="product-info">
@@ -144,8 +220,23 @@
       <p class="product-price" id="product-price"></p>
       <div>
         <button class="btn add-to-cart" onclick="addToCart()">Add to Cart</button>
-        <button class="btn buy-now" onclick="buyNow()">Buy Now</button>
       </div>
+
+      <!-- Etsy-style checkout -->
+      <div class="checkout-wrapper">
+        <label class="checkout-label" for="payment-method">Choose Payment Method:</label>
+        <select id="payment-method">
+          <option value="">-- Select Payment --</option>
+          <option value="stripe-card">Credit / Debit Card</option>
+          <option value="paypal">PayPal</option>
+          <option value="stripe-wallet">Google Pay / Apple Pay</option>
+        </select>
+        <button class="checkout-btn" onclick="checkoutProduct()">
+          <img id="checkout-icon" src="https://cdn-icons-png.flaticon.com/512/888/888879.png" alt="Pay Icon">
+          Buy Now
+        </button>
+      </div>
+
       <a href="cart.html">Go to Cart</a>
     </div>
   </div>
@@ -157,54 +248,40 @@
   </div>
 
   <script>
-    // Get product ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get("id");
+    let currentProduct = null;
 
-    // Fetch product data
     fetch('products.json')
       .then(res => res.json())
       .then(products => {
-        const product = products.find(p => p.id == productId);
+        const product = products.find(p => p.id.toString() === productId);
         if (product) {
+          currentProduct = product;
           document.getElementById("product-name").textContent = product.name;
           document.getElementById("product-image").src = product.image;
           document.getElementById("product-price").textContent = "$" + (product.price / 100).toFixed(2);
           document.getElementById("product-description").textContent = product.description;
 
-          // Store for cart/buy now
-          window.currentProduct = product;
+          // Heart toggle
+          const heartEl = document.querySelector(".heart");
+          const liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+          if (liked.includes(product.id.toString())) heartEl.textContent = "♥";
         }
       });
 
-    // Add to Cart
     function addToCart() {
+      if (!currentProduct) return;
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existing = cart.find(item => item.id == window.currentProduct.id);
-      if (existing) {
-        existing.quantity++;
-      } else {
-        cart.push({ id: window.currentProduct.id, name: window.currentProduct.name, price: window.currentProduct.price, quantity: 1 });
-      }
+      const existing = cart.find(item => item.id.toString() === currentProduct.id.toString());
+      if (existing) existing.quantity++;
+      else cart.push({ id: currentProduct.id.toString(), name: currentProduct.name, price: currentProduct.price, quantity: 1 });
       localStorage.setItem("cart", JSON.stringify(cart));
-      alert(window.currentProduct.name + " added to cart!");
+      alert(currentProduct.name + " added to cart!");
     }
 
-    // Buy Now (Stripe Checkout)
-    async function buyNow() {
-      const response = await fetch("http://localhost:4000/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: [{ id: window.currentProduct.id, name: window.currentProduct.name, price: window.currentProduct.price, quantity: 1 }]
-        })
-      });
-      const data = await response.json();
-      window.location = data.url;
-    }
-
-// ❤️ Heart Toggle Function
     function toggleLike(productId, el) {
+      productId = productId.toString();
       let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
       if (liked.includes(productId)) {
         liked = liked.filter(id => id !== productId);
@@ -214,6 +291,43 @@
         el.textContent = "♥";
       }
       localStorage.setItem("likedItems", JSON.stringify(liked));
+    }
+
+    // Payment icon change
+    const paymentSelect = document.getElementById("payment-method");
+    const checkoutIcon = document.getElementById("checkout-icon");
+    paymentSelect.addEventListener("change", () => {
+      const val = paymentSelect.value;
+      if (val === "paypal") checkoutIcon.src = "https://cdn-icons-png.flaticon.com/512/888/888841.png";
+      else if (val === "stripe-card") checkoutIcon.src = "https://cdn-icons-png.flaticon.com/512/888/888879.png";
+      else if (val === "stripe-wallet") checkoutIcon.src = "https://cdn-icons-png.flaticon.com/512/888/888863.png";
+      else checkoutIcon.src = "https://cdn-icons-png.flaticon.com/512/888/888879.png";
+    });
+
+    async function checkoutProduct() {
+      if (!currentProduct) return;
+      const method = paymentSelect.value;
+      if (!method) { alert("Please select a payment method!"); return; }
+
+      if (method === "paypal") {
+        window.location.href = `https://www.paypal.com/checkoutnow?amount=${(currentProduct.price/100).toFixed(2)}`;
+      } else if (method === "stripe-card") {
+        const response = await fetch("http://localhost:4000/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: [{ id: currentProduct.id, name: currentProduct.name, price: currentProduct.price, quantity: 1 }], paymentType: "card" })
+        });
+        const data = await response.json();
+        window.location = data.url;
+      } else if (method === "stripe-wallet") {
+        const response = await fetch("http://localhost:4000/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: [{ id: currentProduct.id, name: currentProduct.name, price: currentProduct.price, quantity: 1 }], paymentType: "wallet" })
+        });
+        const data = await response.json();
+        window.location = data.url;
+      }
     }
   </script>
 

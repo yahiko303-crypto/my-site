@@ -2,59 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Shopping Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - DjsDopeDesigns</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f6f6f6; color:#333; }
+    .container { max-width:1200px; margin:40px auto; padding:20px; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+    h1 { margin-bottom:20px; }
+    table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+    th, td { padding:12px; text-align:center; border-bottom:1px solid #ddd; }
+    img { width:80px; height:80px; object-fit:cover; border-radius:6px; }
+    .quantity-btn { padding:6px 12px; margin:0 4px; cursor:pointer; border:none; border-radius:4px; background:#f1641e; color:#fff; }
+    .remove-btn { cursor:pointer; color:#f1641e; font-weight:bold; }
+    .total { text-align:right; font-size:18px; margin-top:10px; font-weight:bold; }
+    select, .checkout-btn { padding:10px 14px; font-size:16px; border-radius:6px; margin-top:5px; }
+    .checkout-btn { cursor:pointer; background:#f1641e; color:#fff; border:none; transition:0.3s; }
+    .checkout-btn:hover { background:#d9550e; }
+    a.logo { font-weight:bold; font-size:1.8rem; color:#ff6600; text-decoration:none; }
+    .header { background:#f7f7f7; padding:1rem 0; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+    .header-container { display:flex; align-items:center; justify-content:space-between; max-width:1200px; margin:0 auto; padding:0 1rem; }
+  </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="container header-container">
-      <a href="index.html" class="logo">DjsDopeDesigns</a>
-      <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-left: 20px;">♥ Liked Items</a>
-    </div>
-  </header>
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <a href="index.html" class="logo">DjsDopeDesigns</a>
+    <a href="liked.html" style="color:#f1641e; font-weight:bold;">♥ Liked Items</a>
+  </div>
+</header>
 
-  <!-- Cart Items -->
-  <section class="products">
-    <div class="container">
-      <h2>Your Cart</h2>
-      <div id="cart-items"></div>
-      <p id="cart-total"></p>
-      <button id="checkout-btn">Checkout</button>
-    </div>
-  </section>
+<div class="container">
+  <h1>Your Cart</h1>
+  <table id="cart-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <script>
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const cartItems = document.getElementById("cart-items");
-    const cartTotal = document.getElementById("cart-total");
+  <div class="total" id="cart-total"></div>
 
+  <!-- Checkout Section -->
+  <div style="margin-top:20px;">
+    <label for="payment-method"><strong>Choose Payment Method:</strong></label><br>
+    <select id="payment-method">
+      <option value="">-- Select Payment --</option>
+      <option value="stripe-card">Credit / Debit Card (Visa, MasterCard, AmEx, Discover)</option>
+      <option value="paypal">PayPal</option>
+      <option value="stripe-wallet">Google Pay / Apple Pay</option>
+    </select>
+    <button class="checkout-btn" onclick="processCheckout()">Checkout</button>
+  </div>
+</div>
+
+<script>
+  // Load cart
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  function renderCart() {
+    const tbody = document.querySelector("#cart-table tbody");
+    tbody.innerHTML = "";
     let total = 0;
 
-    cart.forEach(item => {
-      total += item.price * item.quantity;
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <p>${item.name} x ${item.quantity} - $${(item.price/100).toFixed(2)}</p>
-        <button onclick="removeItem('${item.id}')">Remove</button>
+    cart.forEach((item, idx) => {
+      const subtotal = item.price * item.quantity;
+      total += subtotal;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}"></td>
+        <td>${item.name}</td>
+        <td>$${(item.price/100).toFixed(2)}</td>
+        <td>
+          <button class="quantity-btn" onclick="updateQty(${idx}, -1)">-</button>
+          ${item.quantity}
+          <button class="quantity-btn" onclick="updateQty(${idx}, 1)">+</button>
+        </td>
+        <td>$${(subtotal/100).toFixed(2)}</td>
+        <td><span class="remove-btn" onclick="removeItem(${idx})">X</span></td>
       `;
-      cartItems.appendChild(div);
+      tbody.appendChild(tr);
     });
 
-    cartTotal.textContent = "Total: $" + (total/100).toFixed(2);
+    document.getElementById("cart-total").textContent = "Total: $" + (total/100).toFixed(2);
+  }
 
-    function removeItem(id) {
-      const newCart = cart.filter(item => item.id !== id);
-      localStorage.setItem("cart", JSON.stringify(newCart));
-      location.reload();
+  function updateQty(idx, change) {
+    cart[idx].quantity += change;
+    if (cart[idx].quantity <= 0) removeItem(idx);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
+
+  function removeItem(idx) {
+    cart.splice(idx,1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
+
+  renderCart();
+
+  // Checkout
+  function processCheckout() {
+    if (cart.length === 0) { alert("Your cart is empty!"); return; }
+
+    const method = document.getElementById("payment-method").value;
+    if (!method) { alert("Please select a payment method."); return; }
+
+    if (method === "paypal") {
+      // Redirect to PayPal (server endpoint needed)
+      window.location.href = "/paypal-checkout?items=" + encodeURIComponent(JSON.stringify(cart));
+    } else if (method === "stripe-card") {
+      fetch("http://localhost:4000/create-checkout-session", {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ items: cart, paymentType:"card" })
+      })
+      .then(res => res.json())
+      .then(data => window.location.href = data.url)
+      .catch(err => console.error(err));
+    } else if (method === "stripe-wallet") {
+      fetch("http://localhost:4000/create-checkout-session", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ items: cart, paymentType:"wallet" })
+      })
+      .then(res => res.json())
+      .then(data => window.location.href = data.url)
+      .catch(err => console.error(err));
     }
-
-    document.getElementById("checkout-btn").addEventListener("click", async () => {
-      // Call your Stripe checkout here using cart items
-      alert("Checkout functionality goes here.");
-    });
-  </script>
-
+  }
+</script>
 </body>
 </html>

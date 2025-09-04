@@ -10,15 +10,24 @@
 
   <!-- 🌐 Header -->
   <header class="header">
-  <div class="container header-container">
-    <a href="#" class="logo">DjsDopeDesigns</a>
-    <input type="text" class="search-bar" placeholder="Search for products...">
+    <div class="container header-container">
+      <a href="index.html" class="logo">DjsDopeDesigns</a>
+      <input type="text" class="search-bar" placeholder="Search for products...">
 
-<!-- ❤️ Liked Items Link -->
-    <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-top: 8px; display: inline-block;">
-      ♥ Liked Items
-    </a>
-  </div>
+      <!-- ❤️ Liked Items Link -->
+      <a href="liked.html" style="color: #f1641e; font-weight: bold; margin-left: 20px;">
+        ♥ Liked Items
+      </a>
+
+      <!-- 🛒 Cart Icon / Counter -->
+      <a href="cart.html" style="margin-left: 20px; font-weight: bold; position: relative;">
+        🛒 Cart
+        <span id="cart-count" 
+              style="background:#f1641e; color:#fff; font-size:12px; padding:2px 6px; border-radius:50%; position:absolute; top:-8px; right:-12px;">
+          0
+        </span>
+      </a>
+    </div>
 
     <!-- 🏷 Categories -->
     <nav class="categories">
@@ -36,13 +45,11 @@
   <!-- 🛍 Product Grid -->
   <section class="products">
     <div class="container">
-      <section class="products">
-  <div class="container">
-    <div class="cards" id="product-grid">
-      <!-- JS will populate products here -->
+      <div class="cards" id="product-grid">
+        <!-- JS will populate products here -->
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <!-- 🦶 Footer -->
   <footer class="footer">
@@ -92,12 +99,14 @@
           cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1 });
         }
         localStorage.setItem("cart", JSON.stringify(cart));
+        updateCartCount(); // update live cart counter
         alert(`${product.name} added to cart!`);
       });
   }
 
   // Heart toggle
   function toggleLike(productId, el) {
+    productId = productId.toString();
     let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
     if (liked.includes(productId)) {
       liked = liked.filter(id => id !== productId);
@@ -117,14 +126,24 @@
       const productLink = card.querySelector("a");
       if (!productLink || !heart) return;
       const url = new URL(productLink.href, window.location.href);
-      const id = parseInt(url.searchParams.get("id"));
+      const id = url.searchParams.get("id");
       if (liked.includes(id)) {
         heart.textContent = "♥";
       }
     });
   }
-</script>
 
+  // Update live cart count
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const counter = document.getElementById("cart-count");
+    if (counter) counter.textContent = total;
+  }
+
+  // Initialize cart counter on page load
+  updateCartCount();
+</script>
 
 </body>
 </html>
