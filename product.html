@@ -4,154 +4,149 @@
 <meta charset="UTF-8">
 <title>Product Details</title>
 <style>
-/* Reset & global */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f6f6f6;
-  color: #333;
-}
-a { text-decoration: none; color: inherit; }
+  /* 🌐 Global Styles */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f6f6f6;
+    color: #333;
+    padding-top: 60px; /* space for fixed header */
+  }
 
-/* Header */
-.header {
-  width: 100%;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-sizing: border-box;
-}
-.header .logo { font-weight: bold; font-size: 18px; flex-shrink: 0; }
-.header input {
-  flex: 1;
-  margin: 0 10px;
-  height: 36px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-.header .icons { display: flex; gap: 15px; flex-shrink: 0; }
-.header .icons img { width: 28px; height: 28px; }
+  /* Header */
+  .header {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .logo { font-weight: bold; font-size: 20px; text-decoration: none; color: #111; }
+  .search-bar { flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; }
+  .cart, .liked-icon { width: 32px; height: 32px; }
+  .cart img, .liked-icon img { width: 100%; height: 100%; }
 
-/* Product Image */
-.product-image-wrapper {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  position: relative;
-  overflow: hidden;
-}
-.product-image-wrapper img {
-  width: 100%;
-  display: block;
-  border-radius: 0;
-}
-.heart.always {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 36px;
-  height: 36px;
-  background: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
+  /* Product Section */
+  .product-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 600px;
+    width: 100%;
+    padding: 0 10px;
+  }
 
-/* Product Info */
-.product-info {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-.product-price {
-  font-size: 36px; /* 50% bigger */
-  font-weight: bold;
-  margin: 10px 0;
-  color: #111;
-  text-align: left;
-}
-.product-title {
-  font-size: 20px;
-  margin-bottom: 16px;
-  text-align: left;
-}
+  .product-image-wrapper {
+    width: 100%;
+    position: relative;
+  }
+  #product-image {
+    width: 100%;
+    border-radius: 10px;
+    max-width: 100%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+  }
+  .heart.always {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px; height: 36px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
 
-/* Buttons */
-.product-info button {
-  background: #ff6f61;
-  color: #fff;
-  border: none;
-  padding: 18px;
-  border-radius: 50px; /* bubble style */
-  font-size: 20px;
-  margin-bottom: 12px;
-  width: 100%;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.product-info button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
+  /* Price & Title */
+  #product-price {
+    font-size: 36px; /* 50% bigger */
+    font-weight: bold;
+    color: #111;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 10px;
+  }
+  #product-name {
+    font-size: 22px;
+    font-weight: normal;
+    margin-bottom: 20px;
+    text-align: left;
+    width: 100%;
+  }
 
-/* Checkout select */
-.checkout-wrapper select {
-  width: 100%;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  margin-bottom: 12px;
-  font-size: 16px;
-}
-.checkout-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  background: #ff6f61;
-  color: #fff;
-  padding: 18px;
-  border-radius: 50px;
-  border: none;
-  width: 100%;
-  font-size: 20px;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.checkout-btn img { width: 24px; height: 24px; }
-.checkout-btn:hover { 
-  transform: scale(1.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
+  /* Buttons */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .add-to-cart {
+    background: #f1641e;
+    color: #fff;
+  }
+  .add-to-cart:hover { background: #d9550e; }
+  .checkout-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: #ff8c42;
+    color: #fff;
+  }
+  .checkout-btn:hover { background: #e57a25; }
+  .checkout-btn img { width: 24px; height: 24px; }
 
-/* Product Description */
-.details {
-  padding: 16px;
-  background: #fff;
-  margin-top: 16px;
-}
-.details h2 { font-size: 18px; margin-bottom: 8px; }
-.details p { font-size: 14px; line-height: 1.6; color: #555; }
+  /* Checkout Wrapper */
+  .checkout-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  select#payment-method {
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    appearance: none;
+  }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .header input { margin: 0 8px; }
-  .product-price { font-size: 32px; }
-  .product-title { font-size: 18px; }
-  .product-info button, .checkout-wrapper select, .checkout-btn { font-size: 18px; padding: 16px; }
-}
+  /* Description */
+  .details {
+    max-width: 600px;
+    margin: 20px auto 60px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .details h2 { font-size: 22px; margin-bottom: 10px; }
+  .details p { font-size: 16px; line-height: 1.6; color: #555; }
+
+  @media (max-width: 480px) {
+    #product-price { font-size: 32px; }
+    #product-name { font-size: 20px; }
+    .btn { font-size: 16px; padding: 14px; border-radius: 25px; }
+  }
 </style>
 </head>
 <body>
@@ -159,25 +154,21 @@ a { text-decoration: none; color: inherit; }
 <!-- Header -->
 <header class="header">
   <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <input type="text" placeholder="Search products...">
-  <div class="icons">
-    <a href="liked.html"><img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked"></a>
-    <a href="cart.html"><img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart"></a>
-  </div>
+  <input type="text" class="search-bar" placeholder="Search products...">
+  <div class="liked-icon"><img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items"></div>
+  <div class="cart"><img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart"></div>
 </header>
 
-<!-- Product Image -->
-<div class="product-image-wrapper">
-  <div class="heart always" onclick="toggleLike(currentProduct.id, this)">♡</div>
-  <img id="product-image" src="" alt="Product Image">
-</div>
+<!-- Product -->
+<div class="product-container">
+  <div class="product-image-wrapper">
+    <img id="product-image" src="" alt="Product Image">
+    <div class="heart always" onclick="toggleLike(currentProduct.id, this)">♡</div>
+  </div>
+  <p id="product-price"></p>
+  <h1 id="product-name"></h1>
 
-<!-- Product Info -->
-<div class="product-info">
-  <p class="product-price" id="product-price"></p>
-  <h1 class="product-title" id="product-name"></h1>
-
-  <button onclick="addToCart()">Add to Cart</button>
+  <button class="btn add-to-cart" onclick="addToCart()">Add to Cart</button>
 
   <div class="checkout-wrapper">
     <select id="payment-method">
@@ -186,7 +177,7 @@ a { text-decoration: none; color: inherit; }
       <option value="paypal">PayPal</option>
       <option value="stripe-wallet">Google Pay / Apple Pay</option>
     </select>
-    <button class="checkout-btn" onclick="checkoutProduct()">
+    <button class="btn checkout-btn" onclick="checkoutProduct()">
       <img id="checkout-icon" src="https://cdn-icons-png.flaticon.com/512/888/888879.png" alt="Pay Icon"> Buy Now
     </button>
   </div>
@@ -203,43 +194,48 @@ const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get("id");
 let currentProduct = null;
 
+// Fetch product JSON
 fetch('products.json')
 .then(res => res.json())
 .then(products => {
   const product = products.find(p => p.id.toString() === productId);
   if(product){
     currentProduct = product;
-    document.getElementById("product-name").textContent = product.name;
-    document.getElementById("product-image").src = product.image;
+    document.getElementById("product-image").src = product.image || "https://via.placeholder.com/600x400?text=No+Image";
     document.getElementById("product-price").textContent = "$" + (product.price/100).toFixed(2);
+    document.getElementById("product-name").textContent = product.name;
     document.getElementById("product-description").textContent = product.description;
+
     const heartEl = document.querySelector(".heart");
     const liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-    if(liked.includes(product.id.toString())) heartEl.textContent="♥";
+    if(liked.includes(product.id.toString())) heartEl.textContent = "♥";
   }
 });
 
+// Cart
 function addToCart() {
   if(!currentProduct) return;
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   const existing = cart.find(item => item.id.toString()===currentProduct.id.toString());
   if(existing) existing.quantity++;
-  else cart.push({id: currentProduct.id.toString(), name: currentProduct.name, price: currentProduct.price, quantity:1});
+  else cart.push({ id: currentProduct.id.toString(), name: currentProduct.name, price: currentProduct.price, quantity: 1 });
   localStorage.setItem("cart", JSON.stringify(cart));
-  alert(currentProduct.name+" added to cart!");
+  alert(currentProduct.name + " added to cart!");
 }
 
-function toggleLike(productId, el){
+// Like button
+function toggleLike(productId, el) {
   productId = productId.toString();
-  let liked = JSON.parse(localStorage.getItem("likedItems"))||[];
-  if(liked.includes(productId)){ liked = liked.filter(id=>id!==productId); el.textContent="♡"; }
+  let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+  if(liked.includes(productId)) { liked = liked.filter(id=>id!==productId); el.textContent="♡"; }
   else { liked.push(productId); el.textContent="♥"; }
   localStorage.setItem("likedItems", JSON.stringify(liked));
 }
 
+// Checkout
 const paymentSelect = document.getElementById("payment-method");
 const checkoutIcon = document.getElementById("checkout-icon");
-paymentSelect.addEventListener("change", ()=>{
+paymentSelect.addEventListener("change", () => {
   const val = paymentSelect.value;
   if(val==="paypal") checkoutIcon.src="https://cdn-icons-png.flaticon.com/512/888/888841.png";
   else if(val==="stripe-card") checkoutIcon.src="https://cdn-icons-png.flaticon.com/512/888/888879.png";
@@ -247,8 +243,24 @@ paymentSelect.addEventListener("change", ()=>{
   else checkoutIcon.src="https://cdn-icons-png.flaticon.com/512/888/888879.png";
 });
 
-async function checkoutProduct(){
+async function checkoutProduct() {
   if(!currentProduct) return;
   const method = paymentSelect.value;
   if(!method){ alert("Please select a payment method!"); return; }
-  // Payment l
+
+  if(method==="paypal"){
+    window.location.href = `https://www.paypal.com/checkoutnow?amount=${(currentProduct.price/100).toFixed(2)}`;
+  } else {
+    const response = await fetch("http://localhost:4000/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items:[{ id: currentProduct.id, name: currentProduct.name, price: currentProduct.price, quantity:1 }], paymentType: method==="stripe-card"?"card":"wallet" })
+    });
+    const data = await response.json();
+    window.location = data.url;
+  }
+}
+</script>
+
+</body>
+</html>
