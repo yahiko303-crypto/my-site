@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Product Details</title>
 <style>
-  /* Prevent horizontal scroll */
-  * { box-sizing: border-box; }
-  html, body { overflow-x: hidden; }
-
   /* 🌐 Global Styles */
+  html, body {
+    overflow-x: hidden; /* prevent horizontal scroll */
+    width: 100vw;
+  }
+
   body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -25,15 +27,32 @@
     z-index: 1000;
     background: #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    padding: 8px 16px;
+  }
+
+  .header .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    padding: 8px 16px;
+    box-sizing: border-box;
   }
-  .logo { font-weight: bold; font-size: 20px; text-decoration: none; color: #111; }
-  .search-bar { flex: 1; max-width: 40%; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; } /* shortened by 30% */
-  .cart, .liked-icon { width: 32px; height: 32px; }
+
+  .logo { font-weight: bold; font-size: 20px; text-decoration: none; color: #111; flex-shrink:0; }
+  .hamburger { display: none; flex-direction: column; justify-content: space-between; height: 18px; cursor: pointer; }
+  .hamburger span { display: block; height: 2px; width: 25px; background: #111; border-radius: 2px; }
+
+  .search-bar {
+    flex: 1;
+    max-width: 60%;
+    min-width: 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+
+  .cart, .liked-icon { width: 32px; height: 32px; flex-shrink:0; }
   .cart img, .liked-icon img { width: 100%; height: 100%; }
 
   /* Product Section */
@@ -42,9 +61,10 @@
     flex-direction: column;
     align-items: center;
     margin: 20px auto;
-    max-width: 600px;
+    max-width: 100%;
     width: 100%;
     padding: 0 10px;
+    box-sizing: border-box;
   }
 
   .product-image-wrapper {
@@ -57,6 +77,7 @@
     max-width: 100%;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin-bottom: 15px;
+    display: block;
   }
   .heart.always {
     position: absolute;
@@ -136,12 +157,13 @@
 
   /* Description */
   .details {
-    max-width: 600px;
+    max-width: 100%;
     margin: 20px auto 60px;
     padding: 20px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-sizing: border-box;
   }
   .details h2 { font-size: 22px; margin-bottom: 10px; }
   .details p { font-size: 16px; line-height: 1.6; color: #555; }
@@ -150,6 +172,7 @@
     #product-price { font-size: 32px; }
     #product-name { font-size: 20px; }
     .btn { font-size: 16px; padding: 14px; border-radius: 25px; }
+    .hamburger { display: flex; }
   }
 </style>
 </head>
@@ -157,10 +180,21 @@
 
 <!-- Header -->
 <header class="header">
-  <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <input type="text" class="search-bar" placeholder="Search products...">
-  <div class="liked-icon"><img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items"></div>
-  <div class="cart"><img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart"></div>
+  <div class="container">
+    <div class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <a href="index.html" class="logo">DjsDopeDesigns</a>
+    <input type="text" class="search-bar" placeholder="Search products...">
+    <a href="liked.html" class="liked-icon">
+      <img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items">
+    </a>
+    <a href="cart.html" class="cart">
+      <img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart">
+    </a>
+  </div>
 </header>
 
 <!-- Product -->
