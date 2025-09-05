@@ -1,59 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Free Website</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DjsDopeDesigns</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+  body { font-family: Arial,sans-serif; margin:0; background:#f6f6f6; color:#333; overflow-x:hidden; }
+  .header { position: sticky; top:0; background:#fff; z-index:1000; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+  .container { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; max-width:1200px; margin:0 auto; gap:10px; }
+  .logo { font-weight:bold; font-size:20px; text-decoration:none; color:#111; }
+  .search-bar { flex:1; min-width:120px; padding:6px 12px; border-radius:6px; border:1px solid #ccc; max-width:200px; }
+  .cart img, .liked-icon img { width:28px; height:28px; }
+  .products .card { background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:10px; margin:10px; display:inline-block; width:200px; vertical-align:top; text-align:center; }
+  .products .card img { width:100%; height:150px; object-fit:cover; border-radius:8px; }
+  .btn { padding:10px 16px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; background:#f1641e; color:#fff; transition:.3s; }
+  .btn:hover { background:#d9550e; }
+  .heart { cursor:pointer; font-size:20px; position:absolute; top:10px; right:10px; background:#fff; border-radius:50%; width:28px; height:28px; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+</style>
 </head>
 <body>
 
-  <!-- 🌐 Header -->
-  <header class="header">
-  <div class="container header-container">
-    <!-- Hamburger Icon -->
-    <div class="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-
-    <!-- Logo -->
+<header class="header">
+  <div class="container">
     <a href="index.html" class="logo">DjsDopeDesigns</a>
-
-    <!-- Search Bar -->
     <input type="text" class="search-bar" placeholder="Search products...">
-
-    <!-- Heart / Liked Items -->
-  <a href="liked.html" class="liked-icon">
-    <img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items">
-  </a>
-
-    <!-- Shopping Cart Icon -->
-    <a href="cart.html" class="cart">
-      <img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart">
-    </a>
+    <a href="liked.html" class="liked-icon"><img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items"></a>
+    <a href="cart.html" class="cart"><img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart"></a>
   </div>
 </header>
 
-  <!-- 🛍 Product Grid -->
-  <section class="products">
-    <div class="container">
-      <div class="cards" id="product-grid">
-        <!-- JS will populate products here -->
-      </div>
-    </div>
-  </section>
-
-  <!-- 🦶 Footer -->
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2025 MyShop. All rights reserved.</p>
-    </div>
-  </footer>
+<section class="products">
+  <div class="container" id="product-grid"></div>
+</section>
 
 <script>
-  // Fetch products.json and dynamically create product cards
+  // Load products and generate cards
   fetch('products.json')
     .then(res => res.json())
     .then(products => {
@@ -62,82 +44,92 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <div class="heart" onclick="toggleLike(${product.id}, this)">♡</div>
+          <div class="heart" onclick="toggleLike('${product.id}', this)">♡</div>
           <a href="product.html?id=${product.id}">
             <img src="${product.image}" alt="${product.name}">
             <h3>${product.name}</h3>
           </a>
-          <p>$${(product.price / 100).toFixed(2)}</p>
-          <button class="btn" onclick="addToCart(${product.id})">Add to Cart</button>
+          <p>$${(product.price/100).toFixed(2)}</p>
+          <button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>
         `;
         grid.appendChild(card);
       });
-
-      // Restore liked hearts
       restoreLikedHearts();
-    })
-    .catch(err => console.error("Failed to load products:", err));
+    });
 
   // Add to Cart
   function addToCart(productId) {
     fetch('products.json')
       .then(res => res.json())
       .then(products => {
-        const product = products.find(p => p.id === productId);
+        const product = products.find(p => p.id.toString() === productId.toString());
         if (!product) return;
+
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
-        const existing = cart.find(item => item.id === productId);
-        if (existing) {
-          existing.quantity++;
-        } else {
-          cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1 });
-        }
+        const existing = cart.find(item => item.id === product.id.toString());
+        if (existing) existing.quantity++;
+        else cart.push({
+          id: product.id.toString(),
+          name: product.name,
+          price: product.price / 100,
+          quantity: 1,
+          image: product.image || "https://via.placeholder.com/80"
+        });
         localStorage.setItem("cart", JSON.stringify(cart));
-        updateCartCount(); // update live cart counter
+        updateCartCount();
         alert(`${product.name} added to cart!`);
       });
   }
 
-  // Heart toggle
+  // Live cart counter
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+    let counter = document.getElementById("cart-count");
+    if(!counter){
+      const cartIcon = document.querySelector(".cart");
+      counter = document.createElement("span");
+      counter.id = "cart-count";
+      counter.style.position = "absolute";
+      counter.style.top = "-5px";
+      counter.style.right = "-5px";
+      counter.style.background = "#f1641e";
+      counter.style.color = "#fff";
+      counter.style.borderRadius = "50%";
+      counter.style.padding = "2px 6px";
+      counter.style.fontSize = "12px";
+      cartIcon.style.position = "relative";
+      cartIcon.appendChild(counter);
+    }
+    counter.textContent = total;
+  }
+
+  updateCartCount();
+
+  // Like toggle
   function toggleLike(productId, el) {
     productId = productId.toString();
     let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-    if (liked.includes(productId)) {
-      liked = liked.filter(id => id !== productId);
-      el.textContent = "♡";
+    if(liked.includes(productId)){
+      liked = liked.filter(id => id!==productId);
+      el.textContent="♡";
     } else {
       liked.push(productId);
-      el.textContent = "♥";
+      el.textContent="♥";
     }
     localStorage.setItem("likedItems", JSON.stringify(liked));
   }
 
-  // Restore liked hearts
-  function restoreLikedHearts() {
+  function restoreLikedHearts(){
     let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-    document.querySelectorAll(".card").forEach(card => {
+    document.querySelectorAll(".card").forEach(card=>{
       const heart = card.querySelector(".heart");
-      const productLink = card.querySelector("a");
-      if (!productLink || !heart) return;
-      const url = new URL(productLink.href, window.location.href);
-      const id = url.searchParams.get("id");
-      if (liked.includes(id)) {
-        heart.textContent = "♥";
-      }
+      const link = card.querySelector("a");
+      if(!heart || !link) return;
+      const id = new URL(link.href).searchParams.get("id");
+      if(liked.includes(id)) heart.textContent="♥";
     });
   }
-
-  // Update live cart count
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const counter = document.getElementById("cart-count");
-    if (counter) counter.textContent = total;
-  }
-
-  // Initialize cart counter on page load
-  updateCartCount();
 </script>
-
 </body>
 </html>
