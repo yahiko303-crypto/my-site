@@ -243,31 +243,31 @@
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   function renderCart() {
-    const tbody = document.querySelector("#cart-table tbody");
-    tbody.innerHTML = "";
-    let total = 0;
+  const tbody = document.querySelector("#cart-table tbody");
+  tbody.innerHTML = "";
+  let total = 0;
 
-    cart.forEach((item, idx) => {
-      const subtotal = item.price * item.quantity;
-      total += subtotal;
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}"></td>
-        <td>${item.name}</td>
-        <td>$${(item.price/100).toFixed(2)}</td>
-        <td>
-          <button class="quantity-btn" onclick="updateQty(${idx}, -1)">-</button>
-          ${item.quantity}
-          <button class="quantity-btn" onclick="updateQty(${idx}, 1)">+</button>
-        </td>
-        <td>$${(subtotal/100).toFixed(2)}</td>
-        <td><span class="remove-btn" onclick="removeItem(${idx})">X</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
+  cart.forEach((item, idx) => {
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}"></td>
+      <td>${item.name}</td>
+      <td>$${item.price.toFixed(2)}</td>
+      <td>
+        <button class="quantity-btn" onclick="updateQty(${idx}, -1)">-</button>
+        ${item.quantity}
+        <button class="quantity-btn" onclick="updateQty(${idx}, 1)">+</button>
+      </td>
+      <td>$${subtotal.toFixed(2)}</td>
+      <td><span class="remove-btn" onclick="removeItem(${idx})">X</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-    document.getElementById("cart-total").textContent = "Total: $" + (total/100).toFixed(2);
-  }
+  document.getElementById("cart-total").textContent = "Total: $" + total.toFixed(2);
+}
 
   function updateQty(idx, change) {
     cart[idx].quantity += change;
