@@ -12,7 +12,6 @@ body {
   color: #333;
 }
 a { text-decoration: none; color: inherit; }
-button { cursor: pointer; }
 
 /* Header */
 .header {
@@ -26,8 +25,9 @@ button { cursor: pointer; }
   position: sticky;
   top: 0;
   z-index: 1000;
+  box-sizing: border-box;
 }
-.header .logo { font-weight: bold; font-size: 18px; }
+.header .logo { font-weight: bold; font-size: 18px; flex-shrink: 0; }
 .header input {
   flex: 1;
   margin: 0 10px;
@@ -35,15 +35,18 @@ button { cursor: pointer; }
   border-radius: 6px;
   border: 1px solid #ccc;
   padding: 0 10px;
+  box-sizing: border-box;
 }
-.header .icons { display: flex; gap: 15px; }
+.header .icons { display: flex; gap: 15px; flex-shrink: 0; }
 .header .icons img { width: 28px; height: 28px; }
 
 /* Product Image */
 .product-image-wrapper {
-  position: relative;
-  width: 80%; /* reduced size by 20% */
+  width: 100%;
+  max-width: 600px;
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 .product-image-wrapper img {
   width: 100%;
@@ -70,40 +73,43 @@ button { cursor: pointer; }
   padding: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 }
 .product-price {
-  font-size: 28px; /* increased 30% */
+  font-size: 36px; /* 50% bigger */
   font-weight: bold;
   margin: 10px 0;
   color: #111;
+  text-align: left;
 }
 .product-title {
   font-size: 20px;
-  margin-bottom: 10px;
-  text-align: center;
+  margin-bottom: 16px;
+  text-align: left;
 }
 
 /* Buttons */
 .product-info button {
-  width: 90%;
-  background: #f1641e;
+  background: #ff6f61;
   color: #fff;
   border: none;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 18px;
+  padding: 18px;
+  border-radius: 50px; /* bubble style */
+  font-size: 20px;
   margin-bottom: 12px;
-  transition: 0.3s;
+  width: 100%;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .product-info button:hover {
-  background: #d9550e;
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
 /* Checkout select */
 .checkout-wrapper select {
-  width: 90%;
-  padding: 14px;
+  width: 100%;
+  padding: 16px;
   border-radius: 12px;
   border: 1px solid #ccc;
   margin-bottom: 12px;
@@ -114,16 +120,21 @@ button { cursor: pointer; }
   justify-content: center;
   align-items: center;
   gap: 10px;
-  background: #f1641e;
+  background: #ff6f61;
   color: #fff;
-  padding: 16px;
-  border-radius: 12px;
+  padding: 18px;
+  border-radius: 50px;
   border: none;
-  width: 90%;
-  font-size: 18px;
+  width: 100%;
+  font-size: 20px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 .checkout-btn img { width: 24px; height: 24px; }
-.checkout-btn:hover { background: #d9550e; }
+.checkout-btn:hover { 
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
 
 /* Product Description */
 .details {
@@ -133,6 +144,14 @@ button { cursor: pointer; }
 }
 .details h2 { font-size: 18px; margin-bottom: 8px; }
 .details p { font-size: 14px; line-height: 1.6; color: #555; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header input { margin: 0 8px; }
+  .product-price { font-size: 32px; }
+  .product-title { font-size: 18px; }
+  .product-info button, .checkout-wrapper select, .checkout-btn { font-size: 18px; padding: 16px; }
+}
 </style>
 </head>
 <body>
@@ -232,8 +251,4 @@ async function checkoutProduct(){
   if(!currentProduct) return;
   const method = paymentSelect.value;
   if(!method){ alert("Please select a payment method!"); return; }
-  // Payment logic
-}
-</script>
-</body>
-</html>
+  // Payment l
