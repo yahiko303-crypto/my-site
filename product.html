@@ -269,7 +269,7 @@ function addToCart() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   const existing = cart.find(item => item.id.toString()===currentProduct.id.toString());
   if(existing) existing.quantity++;
-  else cart.push({ id: currentProduct.id.toString(), name: currentProduct.name, price: (currentProduct.price / 100).toFixed(2), image: currentProduct.image, quantity: 1 });
+  else cart.push({ id: currentProduct.id.toString(), name: currentProduct.name, price: currentProduct.price / 100, image: currentProduct.image, quantity: 1 });
   localStorage.setItem("cart", JSON.stringify(cart));
   alert(currentProduct.name + " added to cart!");
 }
