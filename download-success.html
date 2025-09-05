@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download Success</title>
+<style>
+.header {
+  padding: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.header .site-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #f1641e;
+  text-decoration: none;
+}
+
+.header .site-title:hover {
+  color: #d9530f;
+}
+
+.downloads-section {
+  background: #fff;
+  padding: 15px 20px;
+  margin: 20px auto 10px auto;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.downloads-section h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+  body { font-family: Arial, sans-serif; background: #f6f6f6; padding: 20px; }
+  h1 { text-align: center; color: #333; }
+  .download-btn {
+    display: inline-block;
+    background-color: #f1641e;
+    color: #fff;
+    padding: 10px 20px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .download-btn:hover { background-color: #d9530f; }
+  .thank-you { text-align: center; margin-bottom: 20px; font-size: 18px; color: #444; }
+</style>
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="site-title">DjsDopeDesigns</a>
+</header>
+<h1>✅ Thank you for your purchase! Click the buttons below to download your items.</h1>
+<div class="downloads-section">
+  <h2>Your Purchased Items</h2>
+</div>
+<div id="downloads"></div>
+<div id="downloads"></div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const products = params.get('products'); // e.g., "5,2,3"
+
+  if(products) {
+    const ids = products.split(',');
+    const downloadsDiv = document.getElementById('downloads');
+
+    ids.forEach(productId => {
+      const button = document.createElement('button');
+      button.textContent = `Download Item ${productId}`;
+button.className = 'download-btn'; // ✅ Add this line to apply your CSS
+      button.onclick = () => {
+        const link = document.createElement('a');
+        link.href = `http://localhost:4000/download/${productId}`;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+      downloadsDiv.appendChild(button);
+    });
+  } else {
+    document.getElementById('downloads').textContent = 'No products found to download.';
+  }
+</script>
+</body>
+</html>

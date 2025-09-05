@@ -12,6 +12,18 @@ th,td{padding:8px;border-bottom:1px solid #ddd;text-align:center;}
 .quantity-btn{padding:4px 8px;background:#f1641e;color:#fff;border:none;border-radius:4px;cursor:pointer;}
 .remove-btn{cursor:pointer;color:#f1641e;font-weight:bold;}
 .total{text-align:right;font-weight:bold;margin-top:10px;}
+.checkout-btn{
+  background-color:#6772e5;
+  color:white;
+  padding:10px 20px;
+  border:none;
+  border-radius:5px;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:20px;
+  display:block;
+  margin-left:auto;
+}
 </style>
 </head>
 <body>
@@ -29,6 +41,9 @@ th,td{padding:8px;border-bottom:1px solid #ddd;text-align:center;}
     <tbody></tbody>
   </table>
   <div class="total" id="cart-total"></div>
+
+  <!-- ✅ Checkout Button goes here -->
+  <button id="checkout-btn" class="checkout-btn">Checkout</button>
 </div>
 
 <script>
@@ -63,6 +78,25 @@ function removeItem(idx){ cart.splice(idx,1); localStorage.setItem("cart",JSON.s
 function updateCartCount(){ const total=cart.reduce((sum,i)=>sum+i.quantity,0); const c=document.getElementById("cart-count"); if(c)c.textContent=total; }
 
 renderCart();
+
+// ✅ Checkout button functionality (updated for multiple downloads)
+document.getElementById("checkout-btn").addEventListener("click", async () => {
+  if(cart.length===0){ alert("Your cart is empty!"); return; }
+
+  try {
+    const res = await fetch("http://localhost:4000/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart })
+    });
+    const data = await res.json();
+
+    if(data.url) window.location.href = data.url;
+  } catch(err) {
+    console.error("Checkout error:", err);
+    alert("Failed to start checkout. Try again.");
+  }
+});
 </script>
 </body>
 </html>

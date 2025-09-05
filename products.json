@@ -1,7 +1,7 @@
 [
-  {"id": "1","name":"Drake Dancing","price":350,"image":"images/1drake-dancing.gif","file": "digital/1drake-dancing.zip","description":"Drake doing the hotline."},
-  {"id": "2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","file": "digital/1drake-dancing.zip","description":"Hammer Girl in action."},
-  {"id": "3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","file": "digital/1drake-dancing.zip","description":"Funny dancing guy."},
-  {"id": "4","name":"Green Dancer","price":350,"image":"images/4green-dancer.gif","file": "digital/1drake-dancing.zip","description":"Green dancer animation."},
-  {"id": "5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","file": "digital/1drake-dancing.zip","description":"Death Drummer rocking."}
+  {"id":"1","name":"Drake Dancing","price":350,"image":"images/1drake-dancing.gif","description":"Drake doing the hotline."},
+  {"id":"2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","description":"Hammer Girl in action."},
+  {"id":"3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","description":"Funny dancing guy."},
+  {"id":"4","name":"Green Dancer","price":350,"image":"images/4green-dancer.gif","description":"Green dancer animation."},
+  {"id":"5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","description":"Death Drummer rocking."}
 ]

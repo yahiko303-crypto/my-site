@@ -1,65 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product</title>
-<style>
-body{font-family:Arial,sans-serif;margin:0;background:#f6f6f6;}
-.header{padding:10px;background:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-.btn{padding:10px 16px;background:#f1641e;color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;margin-top:10px;}
-</style>
-</head>
-<body>
-<header class="header">
-  <a href="index.html">DjsDopeDesigns</a>
-  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
-</header>
-
-<div style="padding:10px;max-width:600px;margin:auto;">
-  <img id="product-image" src="" style="width:100%;border-radius:10px;">
-  <h1 id="product-name"></h1>
-  <p id="product-price"></p>
-  <p id="product-description"></p>
-  <button class="btn" onclick="addToCart()">Add to Cart</button>
-</div>
-
 <script>
-const params = new URLSearchParams(window.location.search);
-const productId = params.get("id");
-let allProducts = [];
-let currentProduct = null;
+  // Get product IDs from URL
+  const params = new URLSearchParams(window.location.search);
+  const products = params.get('products'); // e.g., "5,2,3"
 
-fetch('products.json')
-  .then(res=>res.json())
-  .then(products=>{
-    allProducts = products;
-    currentProduct = products.find(p=>p.id===productId);
-    if(!currentProduct) return;
-    document.getElementById("product-image").src=currentProduct.image;
-    document.getElementById("product-name").textContent=currentProduct.name;
-    document.getElementById("product-price").textContent="$"+(currentProduct.price/100).toFixed(2);
-    document.getElementById("product-description").textContent=currentProduct.description;
-  });
-
-function addToCart(){
-  if(!currentProduct) return;
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i=>i.id===currentProduct.id);
-  if(existing) existing.quantity++;
-  else cart.push({id:currentProduct.id,name:currentProduct.name,price:currentProduct.price/100,quantity:1,image:currentProduct.image});
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert(`${currentProduct.name} added to cart!`);
-  updateCartCount();
-}
-
-// Live cart counter
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
-  document.getElementById("cart-count").textContent=total;
-}
-updateCartCount();
+  if (products) {
+    const ids = products.split(',');
+    ids.forEach(productId => {
+      const link = document.createElement('a');
+      link.href = `http://localhost:4000/download/${productId}`;
+      link.download = '';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+  }
 </script>
-</body>
-</html>
