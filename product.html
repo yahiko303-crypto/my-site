@@ -174,6 +174,19 @@
     .btn { font-size: 16px; padding: 14px; border-radius: 25px; }
     .hamburger { display: flex; }
   }
+
+/* Desktop: keep content centered and not too wide */
+@media (min-width: 769px) {
+  .product-container,
+  .details {
+    max-width: 800px;   /* narrower on desktop */
+    margin: 20px auto;  /* center horizontally */
+  }
+
+  .search-bar {
+    max-width: 300px;   /* search bar doesn’t stretch across huge screens */
+  }
+}
 </style>
 </head>
 <body>
