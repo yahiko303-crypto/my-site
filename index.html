@@ -1,135 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DjsDopeDesigns</title>
-<link rel="stylesheet" href="styles.css" />
 <style>
-  body { font-family: Arial,sans-serif; margin:0; background:#f6f6f6; color:#333; overflow-x:hidden; }
-  .header { position: sticky; top:0; background:#fff; z-index:1000; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
-  .container { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; max-width:1200px; margin:0 auto; gap:10px; }
-  .logo { font-weight:bold; font-size:20px; text-decoration:none; color:#111; }
-  .search-bar { flex:1; min-width:120px; padding:6px 12px; border-radius:6px; border:1px solid #ccc; max-width:200px; }
-  .cart img, .liked-icon img { width:28px; height:28px; }
-  .products .card { background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:10px; margin:10px; display:inline-block; width:200px; vertical-align:top; text-align:center; }
-  .products .card img { width:100%; height:150px; object-fit:cover; border-radius:8px; }
-  .btn { padding:10px 16px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; background:#f1641e; color:#fff; transition:.3s; }
-  .btn:hover { background:#d9550e; }
-  .heart { cursor:pointer; font-size:20px; position:absolute; top:10px; right:10px; background:#fff; border-radius:50%; width:28px; height:28px; display:flex; justify-content:center; align-items:center; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+  body {font-family:Arial,sans-serif;margin:0;background:#f6f6f6;}
+  .header {position:sticky;top:0;background:#fff;padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+  .logo {font-weight:bold;}
+  .cart {position:relative;}
+  #cart-count {position:absolute;top:-5px;right:-5px;background:#f1641e;color:#fff;border-radius:50%;padding:2px 6px;font-size:12px;}
+  .products {display:flex;flex-wrap:wrap;gap:10px;margin:10px;}
+  .card {background:#fff;padding:10px;border-radius:8px;width:calc(33%-20px);box-sizing:border-box;position:relative;}
+  .card img {width:100%;border-radius:6px;}
+  .card .heart {position:absolute;top:5px;right:5px;cursor:pointer;}
+  .btn {padding:8px 12px;margin-top:5px;width:100%;background:#f1641e;color:#fff;border:none;border-radius:6px;cursor:pointer;}
 </style>
 </head>
 <body>
 
 <header class="header">
-  <div class="container">
-    <a href="index.html" class="logo">DjsDopeDesigns</a>
-    <input type="text" class="search-bar" placeholder="Search products...">
-    <a href="liked.html" class="liked-icon"><img src="https://www.svgrepo.com/show/456524/heart-chat.svg" alt="Liked items"></a>
-    <a href="cart.html" class="cart"><img src="https://www.svgrepo.com/show/507858/shopping-cart.svg" alt="Cart"></a>
-  </div>
+  <a href="index.html" class="logo">DjsDopeDesigns</a>
+  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
 
-<section class="products">
-  <div class="container" id="product-grid"></div>
-</section>
+<section class="products" id="product-grid"></section>
 
 <script>
-  // Load products and generate cards
-  fetch('products.json')
-    .then(res => res.json())
-    .then(products => {
-      const grid = document.getElementById('product-grid');
-      products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="heart" onclick="toggleLike('${product.id}', this)">♡</div>
-          <a href="product.html?id=${product.id}">
-            <img src="${product.image}" alt="${product.name}">
-            <h3>${product.name}</h3>
-          </a>
-          <p>$${(product.price/100).toFixed(2)}</p>
-          <button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>
-        `;
-        grid.appendChild(card);
-      });
-      restoreLikedHearts();
+let allProducts = [];
+
+// Load products and render grid
+fetch('products.json')
+  .then(res=>res.json())
+  .then(products=>{
+    allProducts = products;
+    const grid = document.getElementById('product-grid');
+    products.forEach(p=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="heart" onclick="toggleLike('${p.id}', this)">♡</div>
+        <a href="product.html?id=${p.id}">
+          <img src="${p.image}" alt="${p.name}">
+          <h3>${p.name}</h3>
+        </a>
+        <p>$${(p.price/100).toFixed(2)}</p>
+        <button class="btn" onclick="addToCart('${p.id}')">Add to Cart</button>
+      `;
+      grid.appendChild(card);
     });
+    restoreLikedHearts();
+  });
 
-  // Add to Cart
-  function addToCart(productId) {
-    fetch('products.json')
-      .then(res => res.json())
-      .then(products => {
-        const product = products.find(p => p.id.toString() === productId.toString());
-        if (!product) return;
-
-        let cart = JSON.parse(localStorage.getItem("cart")) || [];
-        const existing = cart.find(item => item.id === product.id.toString());
-        if (existing) existing.quantity++;
-        else cart.push({
-          id: product.id.toString(),
-          name: product.name,
-          price: product.price / 100,
-          quantity: 1,
-          image: product.image || "https://via.placeholder.com/80"
-        });
-        localStorage.setItem("cart", JSON.stringify(cart));
-        updateCartCount();
-        alert(`${product.name} added to cart!`);
-      });
-  }
-
-  // Live cart counter
-  function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-    let counter = document.getElementById("cart-count");
-    if(!counter){
-      const cartIcon = document.querySelector(".cart");
-      counter = document.createElement("span");
-      counter.id = "cart-count";
-      counter.style.position = "absolute";
-      counter.style.top = "-5px";
-      counter.style.right = "-5px";
-      counter.style.background = "#f1641e";
-      counter.style.color = "#fff";
-      counter.style.borderRadius = "50%";
-      counter.style.padding = "2px 6px";
-      counter.style.fontSize = "12px";
-      cartIcon.style.position = "relative";
-      cartIcon.appendChild(counter);
-    }
-    counter.textContent = total;
-  }
-
+// Add to cart
+function addToCart(productId){
+  const product = allProducts.find(p=>p.id===productId);
+  if(!product) return;
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const existing = cart.find(i=>i.id===productId);
+  if(existing) existing.quantity++;
+  else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert(`${product.name} added to cart!`);
   updateCartCount();
+}
 
-  // Like toggle
-  function toggleLike(productId, el) {
-    productId = productId.toString();
-    let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-    if(liked.includes(productId)){
-      liked = liked.filter(id => id!==productId);
-      el.textContent="♡";
-    } else {
-      liked.push(productId);
-      el.textContent="♥";
-    }
-    localStorage.setItem("likedItems", JSON.stringify(liked));
-  }
+// Cart counter
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
+  document.getElementById("cart-count").textContent = total;
+}
+updateCartCount();
 
-  function restoreLikedHearts(){
-    let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-    document.querySelectorAll(".card").forEach(card=>{
-      const heart = card.querySelector(".heart");
-      const link = card.querySelector("a");
-      if(!heart || !link) return;
-      const id = new URL(link.href).searchParams.get("id");
-      if(liked.includes(id)) heart.textContent="♥";
-    });
-  }
+// Likes
+function toggleLike(id, el){
+  let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+  if(liked.includes(id)){ liked = liked.filter(i=>i!==id); el.textContent="♡"; }
+  else { liked.push(id); el.textContent="♥"; }
+  localStorage.setItem("likedItems", JSON.stringify(liked));
+}
+function restoreLikedHearts(){
+  let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+  document.querySelectorAll(".card").forEach(card=>{
+    const heart = card.querySelector(".heart");
+    const link = card.querySelector("a");
+    if(!heart||!link) return;
+    const id = new URL(link.href).searchParams.get("id");
+    if(liked.includes(id)) heart.textContent="♥";
+  });
+}
 </script>
 </body>
 </html>
