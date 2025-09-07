@@ -1,22 +1,23 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-// ✅ NEW: Import Stripe + cors
 import Stripe from "stripe";
 import cors from "cors";
+
+// Load environment variables
+import 'dotenv/config';
 
 const app = express();
 const PORT = 4000;
 
-// ✅ NEW: Stripe setup
-const STRIPE_SECRET_KEY = "sk_test_REPLACE_ME"; // <-- replace with your real secret key
-const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2022-11-15" });
+// Initialize Stripe using your secret key from .env
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2022-11-15" });
 
 // Helper for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ NEW: Enable CORS so frontend can talk to backend
+// Enable CORS
 app.use(cors());
 
 // Serve static files
@@ -25,23 +26,21 @@ app.use(express.static(__dirname));
 // JSON parser
 app.use(express.json());
 
-// 🔄 UPDATED: Stripe Checkout session route
+// Stripe Checkout session route
 app.post("/create-checkout-session", async (req, res) => {
   const { items } = req.body;
   if (!items || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
   try {
-    // ✅ NEW: Map cart items into Stripe’s required line_items format
     const line_items = items.map(i => ({
       price_data: {
         currency: "usd",
         product_data: { name: i.name },
-        unit_amount: Math.round(i.price * 100) // Stripe uses cents
+        unit_amount: Math.round(i.price * 100)
       },
       quantity: i.quantity
     }));
 
-    // ✅ NEW: Create a Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items,
@@ -50,7 +49,6 @@ app.post("/create-checkout-session", async (req, res) => {
       cancel_url: `http://127.0.0.1:8080/cart.html`
     });
 
-    // ✅ NEW: Return the Stripe Checkout session URL
     res.json({ url: session.url });
   } catch (err) {
     console.error(err);
@@ -58,7 +56,7 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
-// Download route (same as before, unchanged)
+// Download route (unchanged)
 app.get("/download/:productId", (req, res) => {
   const productId = req.params.productId;
 
