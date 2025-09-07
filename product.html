@@ -5,18 +5,127 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Page</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 0; background: #f6f6f6; }
-  .header { position: sticky; top: 0; background: #fff; padding: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-  .logo { font-weight: bold; }
-  .cart { position: relative; }
-  #cart-count { position: absolute; top: -5px; right: -5px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 12px; }
-  .product-container { max-width: 800px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; display: flex; gap: 20px; flex-wrap: wrap; }
-  .product-image { flex: 1; min-width: 250px; }
-  .product-image img { width: 100%; border-radius: 8px; }
-  .product-info { flex: 2; min-width: 250px; }
-  .product-info h1 { margin-top: 0; }
-  .product-info p { line-height: 1.5; }
-  .btn { padding: 10px 15px; margin-top: 10px; background: #f1641e; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+  /* 🌐 Global Styles */
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0;
+    background: #fafafa;
+    color: #333;
+  }
+
+  /* 🛒 Header */
+  .header {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 1000;
+  }
+  .logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #222;
+    text-decoration: none;
+  }
+  .cart {
+    position: relative;
+    font-size: 1.4rem;
+    text-decoration: none;
+    color: #333;
+  }
+  #cart-count {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #f1641e;
+    color: #fff;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 12px;
+  }
+
+  /* 📦 Product Container */
+  .product-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  /* 🖼️ Product Image */
+  .product-image {
+    flex: 1;
+    min-width: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .product-image img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+  }
+
+  /* 📝 Product Info */
+  .product-info {
+    flex: 2;
+    min-width: 280px;
+  }
+  .product-info h1 {
+    margin: 0 0 15px;
+    font-size: 2rem;
+    color: #111;
+  }
+  .product-info p {
+    margin: 0 0 15px;
+    line-height: 1.6;
+    font-size: 1rem;
+    color: #555;
+  }
+  .product-info strong {
+    font-size: 1.2rem;
+    color: #222;
+  }
+
+  /* 🎨 Buttons */
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    margin: 10px 10px 0 0;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.25s ease, transform 0.15s ease;
+  }
+  .btn-add {
+    background: #f1641e;
+    color: #fff;
+  }
+  .btn-add:hover {
+    background: #d95412;
+    transform: translateY(-2px);
+  }
+  .btn-buy {
+    background: #fff;
+    color: #f1641e;
+    border: 2px solid #f1641e;
+  }
+  .btn-buy:hover {
+    background: #f1641e;
+    color: #fff;
+    transform: translateY(-2px);
+  }
 </style>
 </head>
 <body>
@@ -60,8 +169,8 @@ function renderProduct() {
       <h1>${product.name}</h1>
       <p>${product.description || 'No description available.'}</p>
       <p><strong>Price: $${(product.price/100).toFixed(2)}</strong></p>
-      <button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>
-      <button class="btn" onclick="buyNow('${product.id}')">Buy Now</button>
+      <button class="btn btn-add" onclick="addToCart('${product.id}')">Add to Cart</button>
+      <button class="btn btn-buy" onclick="buyNow('${product.id}')">Buy Now</button>
     </div>
   `;
 }
