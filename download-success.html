@@ -85,7 +85,7 @@
 button.className = 'download-btn'; // ✅ Add this line to apply your CSS
       button.onclick = () => {
         const link = document.createElement('a');
-        link.href = `http://localhost:4000/download/${productId}`;
+        link.href = `https://djsdope.onrender.com/download/${productId}`;
         link.download = '';
         document.body.appendChild(link);
         link.click();
