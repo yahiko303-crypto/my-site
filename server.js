@@ -18,7 +18,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Enable CORS
-app.use(cors());
+app.use(cors({
+  origin: "https://djsdopedesigns.com"
+}));
 
 // Serve static files
 app.use(express.static(__dirname));
@@ -45,8 +47,8 @@ app.post("/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: `http://127.0.0.1:8080/download-success.html?products=${items.map(i => i.id).join(',')}`,
-      cancel_url: `http://127.0.0.1:8080/cart.html`
+      success_url: `https://djsdopedesigns.com/download-success.html?products=${items.map(i => i.id).join(',')}`,
+cancel_url: `https://djsdopedesigns.com/cart.html`
     });
 
     res.json({ url: session.url });

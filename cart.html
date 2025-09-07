@@ -84,7 +84,7 @@ document.getElementById("checkout-btn").addEventListener("click", async () => {
   if(cart.length===0){ alert("Your cart is empty!"); return; }
 
   try {
-    const res = await fetch("http://localhost:4000/create-checkout-session", {
+    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items: cart })
