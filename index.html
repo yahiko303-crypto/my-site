@@ -1,95 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DjsDopeDesigns</title>
-<style>
-  body {font-family:Arial,sans-serif;margin:0;background:#f6f6f6;}
-  .header {position:sticky;top:0;background:#fff;padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-  .logo {font-weight:bold;}
-  .cart {position:relative;}
-  #cart-count {position:absolute;top:-5px;right:-5px;background:#f1641e;color:#fff;border-radius:50%;padding:2px 6px;font-size:12px;}
-  .products {display:flex;flex-wrap:wrap;gap:10px;margin:10px;}
-  .card {background:#fff;padding:10px;border-radius:8px;width:calc(33%-20px);box-sizing:border-box;position:relative;}
-  .card img {width:100%;border-radius:6px;}
-  .card .heart {position:absolute;top:5px;right:5px;cursor:pointer;}
-  .btn {padding:8px 12px;margin-top:5px;width:100%;background:#f1641e;color:#fff;border:none;border-radius:6px;cursor:pointer;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DjsDopeDesigns</title>
+  <!-- ✅ TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100">
 
-<header class="header">
-  <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
-</header>
+  <!-- ✅ Header -->
+  <header class="sticky top-0 bg-white shadow-md flex items-center justify-between px-6 py-4 z-50">
+    <a href="index.html" class="font-bold text-lg">DjsDopeDesigns</a>
+    <a href="cart.html" class="relative flex items-center">
+      🛒
+      <span id="cart-count" class="absolute -top-2 -right-2 bg-orange-600 text-white text-xs rounded-full px-2">0</span>
+    </a>
+  </header>
 
-<section class="products" id="product-grid"></section>
+  <!-- ✅ Product Grid -->
+  <section id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6"></section>
 
-<script>
-let allProducts = [];
+  <!-- ✅ Script -->
+  <script>
+  let allProducts = [];
 
-// Load products and render grid
-fetch('products.json')
-  .then(res=>res.json())
-  .then(products=>{
-    allProducts = products;
-    const grid = document.getElementById('product-grid');
-    products.forEach(p=>{
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="heart" onclick="toggleLike('${p.id}', this)">♡</div>
-        <a href="product.html?id=${p.id}">
-          <img src="${p.image}" alt="${p.name}">
-          <h3>${p.name}</h3>
-        </a>
-        <p>$${(p.price/100).toFixed(2)}</p>
-        <button class="btn" onclick="addToCart('${p.id}')">Add to Cart</button>
-      `;
-      grid.appendChild(card);
+  // Load products and render grid
+  fetch('products.json')
+    .then(res=>res.json())
+    .then(products=>{
+      allProducts = products;
+      const grid = document.getElementById('product-grid');
+      products.forEach(p=>{
+        const card = document.createElement('div');
+        card.className = "group pb-24 relative overflow-hidden bg-white rounded-lg shadow-md";
+        card.innerHTML = `
+          <div class="group-hover:translate-y-0 transition-all duration-700 translate-y-full 
+                      top-0 right-0 bottom-24 left-0 absolute bg-gradient-to-b 
+                      from-transparent to-orange-600 z-10"></div>
+          <a href="product.html?id=${p.id}">
+            <img src="${p.image}" alt="${p.name}" 
+                 class="transition-all group-hover:scale-125 duration-700 h-60 w-full object-cover">
+          </a>
+          <div class="bg-orange-600 absolute z-10 bottom-0 left-0 w-full h-24 
+                      flex flex-col justify-center items-center">
+            <div class="z-20 absolute -top-5 w-full flex justify-center">
+              <div onclick="toggleLike('${p.id}', this)" 
+                   class="cursor-pointer w-10 h-10 flex items-center justify-center 
+                          bg-black text-white p-2 rounded-full transition-all 
+                          group-hover:bg-white group-hover:text-orange-600 
+                          group-hover:rotate-180">
+                ♡
+              </div>
+            </div>
+            <h2 class="font-bold text-white">${p.name}</h2>
+            <span class="text-white">$${(p.price/100).toFixed(2)}</span>
+            <button class="mt-2 bg-black text-white px-4 py-2 rounded-md 
+                           hover:bg-white hover:text-black transition"
+                    onclick="addToCart('${p.id}')">Add to Cart</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      restoreLikedHearts();
     });
-    restoreLikedHearts();
-  });
 
-// Add to cart
-function addToCart(productId){
-  const product = allProducts.find(p=>p.id===productId);
-  if(!product) return;
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i=>i.id===productId);
-  if(existing) existing.quantity++;
-  else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert(`${product.name} added to cart!`);
+  // Add to cart
+  function addToCart(productId){
+    const product = allProducts.find(p=>p.id===productId);
+    if(!product) return;
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const existing = cart.find(i=>i.id===productId);
+    if(existing) existing.quantity++;
+    else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert(`${product.name} added to cart!`);
+    updateCartCount();
+  }
+
+  // Cart counter
+  function updateCartCount(){
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((sum,i)=>sum+i.quantity,0);
+    document.getElementById("cart-count").textContent = total;
+  }
   updateCartCount();
-}
 
-// Cart counter
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
-  document.getElementById("cart-count").textContent = total;
-}
-updateCartCount();
+  // Likes
+  function toggleLike(id, el){
+    let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+    if(liked.includes(id)){ 
+      liked = liked.filter(i=>i!==id); 
+      el.textContent="♡"; 
+    } else { 
+      liked.push(id); 
+      el.textContent="♥"; 
+    }
+    localStorage.setItem("likedItems", JSON.stringify(liked));
+  }
 
-// Likes
-function toggleLike(id, el){
-  let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-  if(liked.includes(id)){ liked = liked.filter(i=>i!==id); el.textContent="♡"; }
-  else { liked.push(id); el.textContent="♥"; }
-  localStorage.setItem("likedItems", JSON.stringify(liked));
-}
-function restoreLikedHearts(){
-  let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
-  document.querySelectorAll(".card").forEach(card=>{
-    const heart = card.querySelector(".heart");
-    const link = card.querySelector("a");
-    if(!heart||!link) return;
-    const id = new URL(link.href).searchParams.get("id");
-    if(liked.includes(id)) heart.textContent="♥";
-  });
-}
-</script>
+  function restoreLikedHearts(){
+    let liked = JSON.parse(localStorage.getItem("likedItems")) || [];
+    document.querySelectorAll(".group").forEach(card=>{
+      const heart = card.querySelector("div[onclick]");
+      const link = card.querySelector("a");
+      if(!heart||!link) return;
+      const id = new URL(link.href).searchParams.get("id");
+      if(liked.includes(id)) heart.textContent="♥";
+    });
+  }
+  </script>
 </body>
 </html>
