@@ -5,126 +5,118 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Page</title>
 <style>
-  /* 🌐 Global Styles */
-  body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    margin: 0;
-    background: #fafafa;
+  /* 🌐 Base Styles */
+  body { 
+    font-family: "Helvetica Neue", Arial, sans-serif; 
+    margin: 0; 
+    background: #fafafa; 
     color: #333;
   }
 
-  /* 🛒 Header */
-  .header {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    padding: 15px 30px;
-    display: flex;
-    align-items: center;
+  /* 🔝 Sticky Header */
+  .header { 
+    position: sticky; 
+    top: 0; 
+    background: #fff; 
+    padding: 12px 20px; 
+    display: flex; 
+    align-items: center; 
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
     z-index: 1000;
   }
-  .logo {
+  .logo { 
+    font-weight: bold; 
+    font-size: 1.2rem; 
+    text-decoration: none; 
+    color: #222; 
+  }
+  .cart { 
+    position: relative; 
+    font-size: 1.4rem; 
+    text-decoration: none;
+    color: #444;
+  }
+  #cart-count { 
+    position: absolute; 
+    top: -8px; 
+    right: -10px; 
+    background: #f1641e; 
+    color: #fff; 
+    border-radius: 50%; 
+    padding: 2px 7px; 
+    font-size: 12px; 
     font-weight: bold;
-    font-size: 1.2rem;
-    color: #222;
-    text-decoration: none;
-  }
-  .cart {
-    position: relative;
-    font-size: 1.4rem;
-    text-decoration: none;
-    color: #333;
-  }
-  #cart-count {
-    position: absolute;
-    top: -6px;
-    right: -10px;
-    background: #f1641e;
-    color: #fff;
-    border-radius: 50%;
-    padding: 2px 7px;
-    font-size: 12px;
   }
 
-  /* 📦 Product Container */
-  .product-container {
-    max-width: 1100px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    display: flex;
-    gap: 40px;
-    flex-wrap: wrap;
+  /* 🛍️ Product Container */
+  .product-container { 
+    max-width: 1000px; 
+    margin: 40px auto; 
+    background: #fff; 
+    padding: 30px; 
+    border-radius: 12px; 
+    display: flex; 
+    gap: 30px; 
+    flex-wrap: wrap; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
   }
 
-  /* 🖼️ Product Image */
-  .product-image {
-    flex: 1;
-    min-width: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* 📸 Image */
+  .product-image { 
+    flex: 1; 
+    min-width: 280px; 
   }
-  .product-image img {
-    width: 100%;
-    max-width: 450px;
-    border-radius: 10px;
-    border: 1px solid #e5e5e5;
+  .product-image img { 
+    width: 100%; 
+    border-radius: 10px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease; 
+  }
+  .product-image img:hover { 
+    transform: scale(1.02); 
   }
 
-  /* 📝 Product Info */
-  .product-info {
-    flex: 2;
-    min-width: 280px;
+  /* ℹ️ Info */
+  .product-info { 
+    flex: 2; 
+    min-width: 280px; 
   }
-  .product-info h1 {
-    margin: 0 0 15px;
-    font-size: 2rem;
-    color: #111;
+  .product-info h1 { 
+    margin: 0 0 10px; 
+    font-size: 2rem; 
+    font-weight: 600;
   }
-  .product-info p {
-    margin: 0 0 15px;
-    line-height: 1.6;
-    font-size: 1rem;
-    color: #555;
+  .product-info p { 
+    line-height: 1.6; 
+    margin-bottom: 15px; 
   }
-  .product-info strong {
-    font-size: 1.2rem;
+  .product-info strong { 
+    font-size: 1.2rem; 
     color: #222;
   }
 
-  /* 🎨 Buttons */
-  .btn {
-    display: inline-block;
-    padding: 12px 20px;
-    margin: 10px 10px 0 0;
-    font-size: 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    transition: background 0.25s ease, transform 0.15s ease;
+  /* 🔘 Buttons */
+  .btn { 
+    display: inline-block; 
+    padding: 12px 20px; 
+    margin-top: 12px; 
+    margin-right: 10px;
+    background: #f1641e; 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    font-weight: 500; 
+    transition: background 0.2s ease, transform 0.15s ease;
   }
-  .btn-add {
-    background: #f1641e;
-    color: #fff;
+  .btn:hover { 
+    background: #d95512; 
+    transform: translateY(-2px); 
   }
-  .btn-add:hover {
-    background: #d95412;
-    transform: translateY(-2px);
-  }
-  .btn-buy {
-    background: #fff;
-    color: #f1641e;
-    border: 2px solid #f1641e;
-  }
-  .btn-buy:hover {
-    background: #f1641e;
-    color: #fff;
-    transform: translateY(-2px);
+  .btn:active { 
+    transform: translateY(0); 
   }
 </style>
 </head>
@@ -168,9 +160,9 @@ function renderProduct() {
     <div class="product-info">
       <h1>${product.name}</h1>
       <p>${product.description || 'No description available.'}</p>
-      <p><strong>Price: $${(product.price/100).toFixed(2)}</strong></p>
-      <button class="btn btn-add" onclick="addToCart('${product.id}')">Add to Cart</button>
-      <button class="btn btn-buy" onclick="buyNow('${product.id}')">Buy Now</button>
+      <p><strong>$${(product.price/100).toFixed(2)}</strong></p>
+      <button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>
+      <button class="btn" onclick="buyNow('${product.id}')">Buy Now</button>
     </div>
   `;
 }
