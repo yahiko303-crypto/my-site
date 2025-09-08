@@ -5,11 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DjsDopeDesigns</title>
 <style>
-  body {font-family:Arial,sans-serif;margin:0;background:#f6f6f6;}
-  .header {position:sticky;top:0;background:#fff;padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-  .logo {font-weight:bold;}
-  .cart {position:relative;}
-  #cart-count {position:absolute;top:-5px;right:-5px;background:#f1641e;color:#fff;border-radius:50%;padding:2px 6px;font-size:12px;}
+  body { 
+    font-family: "Helvetica Neue", Arial, sans-serif; 
+    margin: 0; 
+    background: #fafafa; 
+    color: #333;
+  }
+
+  /* 🔝 Sticky Header */
+  .header { 
+    position: sticky; 
+    top: 0; 
+    background: #fff; 
+    padding: 12px 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
+    z-index: 1000;
+  }
+  .logo { 
+    font-weight: bold; 
+    font-size: 1.2rem; 
+    text-decoration: none; 
+    color: #222; 
+  }
+  .cart { 
+    position: relative; 
+    font-size: 1.4rem; 
+    text-decoration: none;
+    color: #444;
+  }
+  #cart-count { 
+    position: absolute; 
+    top: -8px; 
+    right: -10px; 
+    background: #f1641e; 
+    color: #fff; 
+    border-radius: 50%; 
+    padding: 2px 7px; 
+    font-size: 12px; 
+    font-weight: bold;
+  }
   .products {display:flex;flex-wrap:wrap;gap:10px;margin:10px;}
   .card {background:#fff;padding:10px;border-radius:8px;width:calc(33%-20px);box-sizing:border-box;position:relative;}
   .card img {width:100%;border-radius:6px;}
