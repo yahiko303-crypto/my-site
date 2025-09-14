@@ -14,7 +14,7 @@
   .cart { position:relative; font-size:1.4rem; text-decoration:none; color:#444; }
   #cart-count { position:absolute; top:-8px; right:-10px; background:#f1641e; color:#fff; border-radius:50%; padding:2px 7px; font-size:12px; font-weight:bold; }
 
-  /* Card Styles (Uiverse.io) */
+  /* Uiverse.io Card */
   .card {
     --accent-color: #ffd426;
     position: relative;
@@ -30,21 +30,24 @@
   .card .image-container {
     position: relative;
     width: 100%;
+    height: 130px;
     border-radius: 0.7rem;
     border-top-right-radius: 4rem;
     margin-bottom: 1rem;
-    overflow: hidden; /* ensures rounded corners */
+    overflow: hidden;
   }
 
   .card .image-container img {
     width: 100%;
-    height: auto; /* preserves aspect ratio */
-    display: block;
+    height: 100%;
+    object-fit: cover;
     border-radius: inherit;
   }
 
   .card .content { padding:0 0.8rem; margin-bottom:1rem; }
   .card .content .product-name { font-weight:700; color:#666; font-size:0.7rem; margin-bottom:1rem; }
+  .card .content .price { font-weight:900; font-size:0.9rem; margin-bottom:1rem; }
+
   .card .button-container { display:flex; gap:0.3rem; margin-bottom:10px; }
   .card .button-container .button { border-radius:1.4rem 1.4rem 0.7rem 0.7rem; border:none; padding:0.5rem 0; background:var(--accent-color); color:white; font-weight:900; cursor:pointer; }
   .card .button-container .button:hover { background: orangered; }
