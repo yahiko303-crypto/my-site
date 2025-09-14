@@ -142,19 +142,21 @@ fetch('products.json')
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
-        <div class="card__shine"></div>
-        <div class="card__glow"></div>
-        <div class="card__content">
-          <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
-          <div class="card__text">
-            <h3 class="card__title">${p.name}</h3>
-            <p class="card__description">$${(p.price/100).toFixed(2)}</p>
-          </div>
-          <div class="card__footer">
-            <button onclick="addToCart('${p.id}')"><span class="button_top">Add to Cart</span></button>
-          </div>
-        </div>
-      `;
+  <a href="product.html?id=${p.id}" style="text-decoration:none; color:inherit;">
+    <div class="card__shine"></div>
+    <div class="card__glow"></div>
+    <div class="card__content">
+      <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
+      <div class="card__text">
+        <h3 class="card__title">${p.name}</h3>
+        <p class="card__description">$${(p.price/100).toFixed(2)}</p>
+      </div>
+      <div class="card__footer">
+        <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
+      </div>
+    </div>
+  </a>
+`;
       grid.appendChild(card);
     });
   });
