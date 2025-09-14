@@ -109,9 +109,14 @@
   @media (min-width: 769px) {
     .products {
       grid-template-columns: repeat(4, 1fr);
-      max-width: 1200px;  /* limits width so items aren’t at screen edge */
-      margin: 0 auto;      /* centers grid */
+      max-width: 1200px;
+      margin: 0 auto;
       gap: 20px;
+    }
+    /* Desktop-only image fix: let images expand without cropping */
+    .card__image {
+      max-height: none;
+      flex-grow: 1;
     }
   }
 </style>
