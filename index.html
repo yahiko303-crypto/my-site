@@ -82,41 +82,41 @@
     cursor: pointer;
   }
 
-  /* 🟡 Add to Cart Button Style */
+  /* 🟢 Uiverse.io Button Style */
   button {
-  /* Variables */
-  --button_radius: 0.75em;
-  --button_color: #e8e8e8;
-  --button_outline_color: #000000;
-  font-size: 17px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--button_radius);
-  background: var(--button_outline_color);
-}
+    --button_radius: 0.75em;
+    --button_color: #e8e8e8;
+    --button_outline_color: #000000;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--button_radius);
+    background: var(--button_outline_color);
+    width: 100%;
+    margin-top: auto;
+  }
 
-.button_top {
-  display: block;
-  box-sizing: border-box;
-  border: 2px solid var(--button_outline_color);
-  border-radius: var(--button_radius);
-  padding: 0.75em 1.5em;
-  background: var(--button_color);
-  color: var(--button_outline_color);
-  transform: translateY(-0.2em);
-  transition: transform 0.1s ease;
-}
+  .button_top {
+    display: block;
+    box-sizing: border-box;
+    border: 2px solid var(--button_outline_color);
+    border-radius: var(--button_radius);
+    padding: 0.75em 1.5em;
+    background: var(--button_color);
+    color: var(--button_outline_color);
+    transform: translateY(-0.2em);
+    transition: transform 0.1s ease;
+    text-align: center;
+  }
 
-button:hover .button_top {
-  /* Pull the button upwards when hovered */
-  transform: translateY(-0.33em);
-}
+  button:hover .button_top {
+    transform: translateY(-0.33em);
+  }
 
-button:active .button_top {
-  /* Push the button downwards when pressed */
-  transform: translateY(0);
-}
+  button:active .button_top {
+    transform: translateY(0);
+  }
 
   /* 📱 Mobile: 2 per row */
   @media (max-width: 768px) {
@@ -154,7 +154,9 @@ fetch('products.json')
           <h3>${p.name}</h3>
         </a>
         <p>$${(p.price/100).toFixed(2)}</p>
-        <button class="btn" onclick="addToCart('${p.id}')">Add to Cart</button>
+        <button onclick="addToCart('${p.id}')">
+          <span class="button_top">Add to Cart</span>
+        </button>
       `;
       grid.appendChild(card);
     });
