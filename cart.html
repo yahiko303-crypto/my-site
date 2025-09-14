@@ -5,67 +5,136 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cart</title>
 <style>
-/* Base Styles */
-body { font-family: "Helvetica Neue", Arial, sans-serif; margin: 0; background: #fafafa; color: #333; }
+/* 🔹 Mobile-first base styles */
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  background: #fafafa;
+  color: #333;
+}
 
-/* Sticky Header */
-.header { position: sticky; top: 0; background: #fff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.08); z-index: 1000; }
-.logo { font-family: "Helvetica Neue", Arial, sans-serif; font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
-.cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
-#cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
+.header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  z-index: 1000;
+}
 
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
-.quantity-btn { padding: 4px 8px; background: #f1641e; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-.remove-btn { cursor: pointer; color: #f1641e; font-weight: bold; }
-.total { text-align: right; font-weight: bold; margin-top: 10px; }
+.logo {
+  font-weight: bold;
+  font-size: 1rem; /* smaller for mobile */
+  text-decoration: none;
+  color: #222;
+}
+
+.cart {
+  position: relative;
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: #444;
+}
+
+#cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #f1641e;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.container {
+  padding: 10px;
+  max-width: 100%; /* fit mobile screen */
+  overflow-x: hidden;
+}
+
+h1 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+th, td {
+  padding: 6px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  word-break: break-word; /* prevent horizontal scroll */
+}
+
+.quantity-btn {
+  padding: 2px 6px;
+  background: #f1641e;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.remove-btn {
+  cursor: pointer;
+  color: #f1641e;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.total {
+  text-align: right;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
 .checkout-btn {
   background-color: #6772e5;
   color: white;
-  padding: 10px 20px;
+  padding: 8px 15px;
   border: none;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 15px;
   display: block;
   margin-left: auto;
 }
 
-/* Mobile-specific adjustments */
-@media (max-width: 480px) {
-  table, thead, tbody, th, td, tr { display: block; width: 100%; }
-  thead tr { display: none; }
-  tbody td { text-align: right; padding-left: 50%; position: relative; }
-  tbody td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 10px;
-    width: 45%;
-    padding-left: 5px;
-    font-weight: bold;
-    text-align: left;
-  }
-  tbody td img { width: 40px; height: 40px; }
-  .quantity-btn { padding: 3px 6px; font-size: 0.8rem; }
-  .checkout-btn { width: 100%; margin-left: 0; padding: 12px 0; font-size: 16px; }
+/* 🔹 Desktop enhancements */
+@media (min-width: 768px){
+  .logo { font-size: 1.2rem; }
+  .cart { font-size: 1.4rem; }
+  table { font-size: 14px; }
+  .quantity-btn { font-size: 12px; padding: 4px 8px; }
+  .checkout-btn { font-size: 16px; padding: 10px 20px; }
+  .container { max-width: 800px; margin: auto; }
 }
 </style>
 </head>
 <body>
-
 <header class="header">
   <a href="index.html" class="logo">DjsDopeDesigns</a>
   <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
 
-<div style="padding:10px; max-width:800px; margin:auto;">
+<div class="container">
   <h1>Your Cart</h1>
   <table id="cart-table">
     <thead>
-      <tr>
-        <th>Product</th><th>Name</th><th>Price</th><th>Quantity</th><th>Subtotal</th><th>Remove</th>
-      </tr>
+      <tr><th>Product</th><th>Name</th><th>Price</th><th>Qty</th><th>Subtotal</th><th>Remove</th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -76,60 +145,41 @@ th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
 <script>
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-function renderCart() {
-  const tbody = document.querySelector("#cart-table tbody");
-  tbody.innerHTML = "";
-  if (cart.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6">Your cart is empty.</td></tr>';
-    document.getElementById("cart-total").textContent = "Total: $0.00";
+function renderCart(){
+  const tbody=document.querySelector("#cart-table tbody");
+  tbody.innerHTML="";
+  if(cart.length===0){
+    tbody.innerHTML='<tr><td colspan="6">Your cart is empty.</td></tr>';
+    document.getElementById("cart-total").textContent="Total: $0.00";
     return;
   }
-  let total = 0;
-  cart.forEach((item, idx) => {
-    const subtotal = item.price * item.quantity;
-    total += subtotal;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td data-label="Product"><img src="${item.image}" alt="${item.name}"></td>
-      <td data-label="Name">${item.name}</td>
-      <td data-label="Price">$${item.price.toFixed(2)}</td>
-      <td data-label="Quantity">
-        <button class="quantity-btn" onclick="updateQty(${idx},-1)">-</button>${item.quantity}
-        <button class="quantity-btn" onclick="updateQty(${idx},1)">+</button>
-      </td>
-      <td data-label="Subtotal">$${subtotal.toFixed(2)}</td>
-      <td data-label="Remove"><span class="remove-btn" onclick="removeItem(${idx})">X</span></td>
-    `;
+  let total=0;
+  cart.forEach((item,idx)=>{
+    const subtotal = item.price*item.quantity; total+=subtotal;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><img src="${item.image}" style="width:40px;height:40px;"></td>
+                  <td>${item.name}</td>
+                  <td>$${item.price.toFixed(2)}</td>
+                  <td>
+                    <button class="quantity-btn" onclick="updateQty(${idx},-1)">-</button>${item.quantity}
+                    <button class="quantity-btn" onclick="updateQty(${idx},1)">+</button>
+                  </td>
+                  <td>$${subtotal.toFixed(2)}</td>
+                  <td><span class="remove-btn" onclick="removeItem(${idx})">X</span></td>`;
     tbody.appendChild(tr);
   });
-  document.getElementById("cart-total").textContent = "Total: $" + total.toFixed(2);
+  document.getElementById("cart-total").textContent="Total: $"+total.toFixed(2);
   updateCartCount();
 }
 
-function updateQty(idx, change) {
-  cart[idx].quantity += change;
-  if (cart[idx].quantity <= 0) removeItem(idx);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-}
-
-function removeItem(idx) {
-  cart.splice(idx, 1);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
-}
-
-function updateCartCount() {
-  const total = cart.reduce((sum, i) => sum + i.quantity, 0);
-  const c = document.getElementById("cart-count");
-  if (c) c.textContent = total;
-}
+function updateQty(idx,change){ cart[idx].quantity+=change; if(cart[idx].quantity<=0) removeItem(idx); localStorage.setItem("cart",JSON.stringify(cart)); renderCart(); }
+function removeItem(idx){ cart.splice(idx,1); localStorage.setItem("cart",JSON.stringify(cart)); renderCart(); }
+function updateCartCount(){ const total=cart.reduce((sum,i)=>sum+i.quantity,0); const c=document.getElementById("cart-count"); if(c)c.textContent=total; }
 
 renderCart();
 
-// Checkout button
 document.getElementById("checkout-btn").addEventListener("click", async () => {
-  if (cart.length === 0) { alert("Your cart is empty!"); return; }
+  if(cart.length===0){ alert("Your cart is empty!"); return; }
   try {
     const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
       method: "POST",
@@ -137,13 +187,12 @@ document.getElementById("checkout-btn").addEventListener("click", async () => {
       body: JSON.stringify({ items: cart })
     });
     const data = await res.json();
-    if (data.url) window.location.href = data.url;
+    if(data.url) window.location.href = data.url;
   } catch(err) {
     console.error("Checkout error:", err);
     alert("Failed to start checkout. Try again.");
   }
 });
 </script>
-
 </body>
 </html>
