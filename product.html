@@ -5,172 +5,362 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Page</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f6f6f6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+/* From Uiverse.io by Smit-Prajapati */ 
+.card {
+  --accent-color: #ffd426;
+  position: relative;
+  width: 240px;
+  background: white;
+  border-radius: 1rem;
+  padding: 0.3rem;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 50px 30px -20px;
+  transition: all 0.5s ease-in-out;
+}
+
+.card .image-container {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  border-radius: 0.7rem;
+  border-top-right-radius: 4rem;
+  margin-bottom: 1rem;
+}
+
+.card .image-container img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.card .image-container .svg {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+}
+
+.card .image-container .price {
+  position: absolute;
+  right: 0.7rem;
+  bottom: -1rem;
+  background: white;
+  color: var(--accent-color);
+  font-weight: 900;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  border-radius: 1rem 1rem 2rem 2rem;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 15px 0px;
+}
+
+.card .favorite {
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+
+.card .favorite input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.card .favorite input:checked ~ svg {
+  animation: bouncing 0.5s;
+  fill: rgb(255, 95, 95);
+  filter: drop-shadow(0px 3px 1px rgba(53, 53, 53, 0.14));
+}
+
+.card .favorite svg {
+  fill: #a8a8a8;
+}
+
+.card .content {
+  padding: 0px 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.card .content .brand {
+  font-weight: 900;
+  color: #a6a6a6;
+}
+
+.card .content .product-name {
+  font-weight: 700;
+  color: #666666;
+  font-size: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.card .content .color-size-container {
+  display: flex;
+  justify-content: space-between;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #a8a8a8;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.card .content .color-size-container > * {
+  flex: 1;
+}
+
+.card .content .color-size-container .colors .colors-container {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem;
+  font-size: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.card .content .color-size-container .colors .colors-container .color {
+  height: 14px;
+  position: relative;
+}
+
+.card .content .color-size-container .colors .colors-container .color:hover .color-name {
+  display: block;
+}
+
+.card .content .color-size-container .colors .colors-container .color a {
+  display: inline-block;
+  height: 100%;
+  aspect-ratio: 1;
+  border: 3px solid black;
+  border-radius: 50%;
+}
+
+.card .content .color-size-container .colors .colors-container .color .color-name {
+  display: none;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99;
+  background: black;
+  padding: 0.2rem 1rem;
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.card .content .color-size-container .colors .colors-container .color:first-child a {
+  border-color: #ffd426;
+}
+
+.card .content .color-size-container .colors .colors-container .color:nth-child(2) a {
+  background: #144076;
+}
+
+.card .content .color-size-container .colors .colors-container .color:nth-child(3) a {
+  border-color: #00b9ff;
+}
+
+.card .content .color-size-container .colors .colors-container .color:nth-child(4) a {
+  border-color: #ff6ba1;
+}
+
+.card .content .color-size-container .colors .colors-container .active {
+  border-color: black;
+}
+
+.card .content .color-size-container .sizes .size-container {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.2rem;
+}
+
+.card .content .color-size-container .sizes .size-container .size {
+  height: 14px;
+}
+
+.card .content .color-size-container .sizes .size-container .size .size-radio {
+  cursor: pointer;
+}
+
+.card .content .color-size-container .sizes .size-container .size .size-radio input {
+  display: none;
+}
+
+.card .content .color-size-container .sizes .size-container .size .size-radio input:checked ~ .name {
+  background: var(--accent-color);
+  border-radius: 2rem 2rem 1.5rem 1.5rem;
+  color: white;
+}
+
+.card .content .color-size-container .sizes .size-container .size .size-radio .name {
+  display: grid;
+  place-content: center;
+  height: 100%;
+  aspect-ratio: 1.2/1;
+  text-decoration: none;
+  color: #484848;
+  font-size: 0.5rem;
+  text-align: center;
+}
+
+.card .content .rating {
+  color: #a8a8a8;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card .content .rating svg {
+  height: 12px;
+}
+
+.card .button-container {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.card .button-container .button {
+  border-radius: 1.4rem 1.4rem 0.7rem 0.7rem;
+  border: none;
+  padding: 0.5rem 0;
+  background: var(--accent-color);
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.card .button-container .button:hover {
+  background: orangered;
+}
+
+.card .button-container .buy-button {
+  flex: auto;
+}
+
+.card .button-container .cart-button {
+  display: grid;
+  place-content: center;
+  width: 50px;
+}
+
+.card .button-container .cart-button svg {
+  width: 15px;
+  fill: white;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+@keyframes bouncing {
+  from, to {
+    transform: scale(1, 1);
   }
 
-  /* ==== Card from Uiverse.io ==== */
-  .card {
-    --accent-color: #ffd426;
-    position: relative;
-    width: 240px;
-    background: white;
-    border-radius: 1rem;
-    padding: 0.3rem;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 50px 30px -20px;
-    transition: all 0.5s ease-in-out;
+  25% {
+    transform: scale(1.5, 2.1);
   }
 
-  .card .image-container {
-    position: relative;
-    width: 100%;
-    height: 240px; /* increased for full photo */
-    border-radius: 0.7rem;
-    border-top-right-radius: 4rem;
-    margin-bottom: 1rem;
-    overflow: hidden;
+  50% {
+    transform: scale(2.1, 1.5);
   }
 
-  .card .image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: inherit;
-    transform: rotate(-2deg); /* slanted photo */
+  75% {
+    transform: scale(1.5, 2.05);
   }
+}
 
-  .card .image-container .price {
-    position: absolute;
-    right: 0.7rem;
-    bottom: -1rem;
-    background: white;
-    color: var(--accent-color);
-    font-weight: 900;
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    border-radius: 1rem 1rem 2rem 2rem;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 15px 0px;
-  }
-
-  .card .favorite {
-    position: absolute;
-    width: 19px;
-    height: 19px;
-    top: 5px;
-    right: 5px;
-    cursor: pointer;
-  }
-
-  .card .favorite input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .card .favorite input:checked ~ svg {
-    animation: bouncing 0.5s;
-    fill: rgb(255, 95, 95);
-    filter: drop-shadow(0px 3px 1px rgba(53, 53, 53, 0.14));
-  }
-
-  .card .favorite svg {
-    fill: #a8a8a8;
-  }
-
-  .card .content {
-    padding: 0px 0.8rem;
-    margin-bottom: 1rem;
-  }
-
-  .card .content .brand {
-    font-weight: 900;
-    color: #a6a6a6;
-  }
-
-  .card .content .product-name {
-    font-weight: 700;
-    color: #666666;
-    font-size: 0.7rem;
-    margin-bottom: 1rem;
-  }
-
-  .card .button-container {
-    display: flex;
-    gap: 0.3rem;
-  }
-
-  .card .button-container .button {
-    border-radius: 1.4rem 1.4rem 0.7rem 0.7rem;
-    border: none;
-    padding: 0.5rem 0;
-    background: var(--accent-color);
-    color: white;
-    font-weight: 900;
-    cursor: pointer;
-  }
-
-  .card .button-container .button:hover {
-    background: orangered;
-  }
-
-  .card .button-container .buy-button {
-    flex: auto;
-  }
-
-  .card .button-container .cart-button {
-    display: grid;
-    place-content: center;
-    width: 50px;
-  }
-
-  .card .button-container .cart-button svg {
-    width: 15px;
-    fill: white;
-  }
-
-  .card:hover {
-    transform: scale(1.03);
-  }
-
-  @keyframes bouncing {
-    from, to {
-      transform: scale(1, 1);
-    }
-    25% { transform: scale(1.5, 2.1); }
-    50% { transform: scale(2.1, 1.5); }
-    75% { transform: scale(1.5, 2.05); }
-  }
+/* Body styling for demo */
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 50px;
+  background: #f0f0f0;
+}
 </style>
 </head>
 <body>
 
 <div class="card">
   <div class="image-container">
-    <img src="https://images.unsplash.com/photo-1593032457865-912f7b527153" alt="Product">
-    <div class="price">$49</div>
+    <img src="https://via.placeholder.com/240x130" alt="Product Image">
+    <div class="price">$49.99</div>
     <div class="favorite">
       <input type="checkbox" id="fav1">
-      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 
-      7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 
-      5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42
+                 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81
+                 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4
+                 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
     </div>
   </div>
+
   <div class="content">
     <div class="brand">Brand Name</div>
-    <div class="product-name">Product Title</div>
+    <div class="product-name">Product Name</div>
+
+    <div class="color-size-container">
+      <div class="colors">
+        <ul class="colors-container">
+          <li class="color"><a href="#"></a></li>
+          <li class="color"><a href="#"></a></li>
+          <li class="color"><a href="#"></a></li>
+          <li class="color"><a href="#"></a></li>
+        </ul>
+      </div>
+      <div class="sizes">
+        <ul class="size-container">
+          <li class="size">
+            <div class="size-radio">
+              <input type="radio" name="size1" id="s1" checked>
+              <a class="name" href="#">S</a>
+            </div>
+          </li>
+          <li class="size">
+            <div class="size-radio">
+              <input type="radio" name="size1" id="s2">
+              <a class="name" href="#">M</a>
+            </div>
+          </li>
+          <li class="size">
+            <div class="size-radio">
+              <input type="radio" name="size1" id="s3">
+              <a class="name" href="#">L</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rating">
+      <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03
+      L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      <span>4.5</span>
+    </div>
   </div>
+
   <div class="button-container">
-    <button class="button buy-button">Buy Now</button>
+    <button class="button buy-button">Buy</button>
     <button class="button cart-button">
-      <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-2h12V6H7v10zm10 
-      2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22
+                 7 22s2-.9 2-2-.9-2-2-2zm10
+                 0c-1.1 0-1.99.9-1.99 2S15.9 22
+                 17 22s2-.9 2-2-.9-2-2-2zM7.82
+                 14l-.94-2h11.45l1.24 3H7.82zM6.16
+                 6l-.94-2H1v2h4.16z"/>
+      </svg>
     </button>
   </div>
 </div>
