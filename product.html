@@ -5,25 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Page</title>
 <style>
-  body { 
-    font-family: "Helvetica Neue", Arial, sans-serif; 
-    margin: 0; 
-    background: #fafafa; 
-    color: #333;
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f6f6f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
   }
-  .header { 
-    position: sticky; top: 0; background: #fff; padding: 12px 20px; 
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08); z-index: 1000;
-  }
-  .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
-  .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
-  #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
 
-  /* Product Container */
-  .product-container { display: flex; justify-content: center; align-items: center; margin: 20px; }
-
-  /* ==== Uiverse.io Card Style ==== */
+  /* ==== Card from Uiverse.io ==== */
   .card {
     --accent-color: #ffd426;
     position: relative;
@@ -34,113 +26,154 @@
     box-shadow: rgba(100, 100, 111, 0.2) 0px 50px 30px -20px;
     transition: all 0.5s ease-in-out;
   }
+
   .card .image-container {
     position: relative;
     width: 100%;
-    height: 240px; /* increase height so full photo fits */
+    height: 240px; /* increased for full photo */
     border-radius: 0.7rem;
     border-top-right-radius: 4rem;
     margin-bottom: 1rem;
+    overflow: hidden;
   }
+
   .card .image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: inherit;
+    transform: rotate(-2deg); /* slanted photo */
   }
-  .card .content { padding: 0px 0.8rem; margin-bottom: 1rem; }
-  .card .content .brand { font-weight: 900; color: #a6a6a6; }
-  .card .content .product-name { font-weight: 700; color: #666666; font-size: 0.7rem; margin-bottom: 1rem; }
-  .card .button-container { display: flex; gap: 0.3rem; margin-bottom: 1rem; }
-  .card .button-container .button { border-radius: 1.4rem 1.4rem 0.7rem 0.7rem; border: none; padding: 0.5rem 0; background: var(--accent-color); color: white; font-weight: 900; cursor: pointer; flex: 1; }
-  .card .button-container .button:hover { background: orangered; }
-  .card:hover { transform: scale(1.03); }
 
-  @media (max-width: 480px) {
-    .card { width: 90%; }
-    .card .image-container { height: 200px; }
+  .card .image-container .price {
+    position: absolute;
+    right: 0.7rem;
+    bottom: -1rem;
+    background: white;
+    color: var(--accent-color);
+    font-weight: 900;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    border-radius: 1rem 1rem 2rem 2rem;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 15px 0px;
+  }
+
+  .card .favorite {
+    position: absolute;
+    width: 19px;
+    height: 19px;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+  }
+
+  .card .favorite input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .card .favorite input:checked ~ svg {
+    animation: bouncing 0.5s;
+    fill: rgb(255, 95, 95);
+    filter: drop-shadow(0px 3px 1px rgba(53, 53, 53, 0.14));
+  }
+
+  .card .favorite svg {
+    fill: #a8a8a8;
+  }
+
+  .card .content {
+    padding: 0px 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .card .content .brand {
+    font-weight: 900;
+    color: #a6a6a6;
+  }
+
+  .card .content .product-name {
+    font-weight: 700;
+    color: #666666;
+    font-size: 0.7rem;
+    margin-bottom: 1rem;
+  }
+
+  .card .button-container {
+    display: flex;
+    gap: 0.3rem;
+  }
+
+  .card .button-container .button {
+    border-radius: 1.4rem 1.4rem 0.7rem 0.7rem;
+    border: none;
+    padding: 0.5rem 0;
+    background: var(--accent-color);
+    color: white;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .card .button-container .button:hover {
+    background: orangered;
+  }
+
+  .card .button-container .buy-button {
+    flex: auto;
+  }
+
+  .card .button-container .cart-button {
+    display: grid;
+    place-content: center;
+    width: 50px;
+  }
+
+  .card .button-container .cart-button svg {
+    width: 15px;
+    fill: white;
+  }
+
+  .card:hover {
+    transform: scale(1.03);
+  }
+
+  @keyframes bouncing {
+    from, to {
+      transform: scale(1, 1);
+    }
+    25% { transform: scale(1.5, 2.1); }
+    50% { transform: scale(2.1, 1.5); }
+    75% { transform: scale(1.5, 2.05); }
   }
 </style>
 </head>
 <body>
 
-<header class="header">
-  <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
-</header>
-
-<div class="product-container" id="product-container">
-  <!-- Product content will be rendered here -->
-</div>
-
-<script>
-let allProducts = [];
-
-// Load products.json to get product info
-fetch('products.json')
-  .then(res => res.json())
-  .then(products => {
-    allProducts = products;
-    renderProduct();
-  });
-
-function renderProduct() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  const product = allProducts.find(p => p.id === id);
-
-  if (!product) {
-    document.getElementById('product-container').innerHTML = "<p>Product not found.</p>";
-    return;
-  }
-
-  const container = document.getElementById('product-container');
-  container.innerHTML = `
-    <div class="card">
-      <div class="image-container">
-        <img src="${product.image}" alt="${product.name}">
-      </div>
-      <div class="content">
-        <div class="brand">Brand</div>
-        <div class="product-name">${product.name}</div>
-      </div>
-      <div class="button-container">
-        <button class="button buy-button" onclick="buyNow('${product.id}')">Buy Now</button>
-        <button class="button cart-button" onclick="addToCart('${product.id}')">Add to Cart</button>
-      </div>
+<div class="card">
+  <div class="image-container">
+    <img src="https://images.unsplash.com/photo-1593032457865-912f7b527153" alt="Product">
+    <div class="price">$49</div>
+    <div class="favorite">
+      <input type="checkbox" id="fav1">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 
+      7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 
+      5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
     </div>
-  `;
-}
-
-// Add to cart
-function addToCart(productId){
-  const product = allProducts.find(p => p.id === productId);
-  if(!product) return;
-
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i => i.id === productId);
-  if(existing) existing.quantity++;
-  else cart.push({id: product.id, name: product.name, price: product.price/100, quantity:1, image: product.image});
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert(`${product.name} added to cart!`);
-  updateCartCount();
-}
-
-// Buy now
-function buyNow(productId){
-  addToCart(productId);
-  window.location.href = 'cart.html';
-}
-
-// Update cart counter
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const total = cart.reduce((sum,i) => sum + i.quantity, 0);
-  document.getElementById("cart-count").textContent = total;
-}
-
-updateCartCount();
-</script>
+  </div>
+  <div class="content">
+    <div class="brand">Brand Name</div>
+    <div class="product-name">Product Title</div>
+  </div>
+  <div class="button-container">
+    <button class="button buy-button">Buy Now</button>
+    <button class="button cart-button">
+      <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm0-2h12V6H7v10zm10 
+      2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+    </button>
+  </div>
+</div>
 
 </body>
 </html>
