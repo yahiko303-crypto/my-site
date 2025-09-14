@@ -47,11 +47,54 @@
     font-size: 12px; 
     font-weight: bold;
   }
-  .products {display:flex;flex-wrap:wrap;gap:10px;margin:10px;}
-  .card {background:#fff;padding:10px;border-radius:8px;width:calc(33%-20px);box-sizing:border-box;position:relative;}
-  .card img {width:100%;border-radius:6px;}
-  .card .heart {position:absolute;top:5px;right:5px;cursor:pointer;}
-  .btn {padding:8px 12px;margin-top:5px;width:100%;background:#f1641e;color:#fff;border:none;border-radius:6px;cursor:pointer;}
+
+  /* 🛍 Product Grid */
+  .products {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 per row on desktop */
+    gap: 15px;
+    margin: 15px;
+  }
+
+  .card {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card img {
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .card .heart {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    margin-top: auto;
+    width: 100%;
+    background: #f1641e;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* 📱 Mobile: 2 per row */
+  @media (max-width: 768px) {
+    .products {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
 </style>
 </head>
 <body>
