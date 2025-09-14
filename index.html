@@ -24,48 +24,26 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
     z-index: 1000;
   }
-  .logo { 
-    font-weight: bold; 
-    font-size: 1.2rem; 
-    text-decoration: none; 
-    color: #222; 
-  }
-  .cart { 
-    position: relative; 
-    font-size: 1.4rem; 
-    text-decoration: none;
-    color: #444;
-  }
-  #cart-count { 
-    position: absolute; 
-    top: -8px; 
-    right: -10px; 
-    background: #f1641e; 
-    color: #fff; 
-    border-radius: 50%; 
-    padding: 2px 7px; 
-    font-size: 12px; 
-    font-weight: bold;
-  }
+  .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
+  .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
+  #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
 
-  /* 🛍 Product Grid */
+  /* 🛍 Responsive Product Grid */
   .products {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
     gap: 20px;
-    margin: 20px auto;
+    padding: 20px;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
-  /* 🟣 Card Style with Uiverse.io Effects */
+  /* 🟣 Card Style */
   .card {
     --card-bg: #ffffff;
     --card-accent: #7c3aed;
     --card-text: #1e293b;
     --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 
-    width: 250px;       /* old card width */
-    height: 300px;      /* old card height */
     background: var(--card-bg);
     border-radius: 20px;
     position: relative;
@@ -73,10 +51,10 @@
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     display: flex;
     flex-direction: column;
+    aspect-ratio: 5/6; /* keeps consistent aspect ratio */
   }
 
   .card__shine { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%); opacity: 0; transition: opacity 0.3s ease; }
@@ -84,18 +62,14 @@
 
   .card__content { padding: 1.25em; height: 100%; display: flex; flex-direction: column; gap: 0.75em; position: relative; z-index: 2; }
 
-  .card__badge { position: absolute; top: 12px; right: 12px; background: #10b981; color: white; padding: 0.25em 0.5em; border-radius: 999px; font-size: 0.7em; font-weight: 600; transform: scale(0.8); opacity: 0; transition: all 0.4s ease 0.1s; }
-
-  .card__image { width: 100%; height: 100px; background: linear-gradient(45deg, #a78bfa, #8b5cf6); border-radius: 12px; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden; }
-  .card__image::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 30%), repeating-linear-gradient(45deg, rgba(139,92,246,0.1) 0px, rgba(139,92,246,0.1) 2px, transparent 2px, transparent 4px); opacity: 0.5; }
+  .card__image { width: 100%; flex-shrink: 0; border-radius: 12px; overflow: hidden; }
+  .card__image img { width: 100%; height: auto; object-fit: cover; display: block; }
 
   .card__text { display: flex; flex-direction: column; gap: 0.25em; }
   .card__title { color: var(--card-text); font-size: 1.1em; margin: 0; font-weight: 700; transition: all 0.3s ease; }
   .card__description { color: var(--card-text); font-size: 0.75em; margin: 0; opacity: 0.7; transition: all 0.3s ease; }
 
   .card__footer { display: flex; justify-content: center; align-items: center; margin-top: auto; }
-
-  .card__price { color: var(--card-text); font-weight: 700; font-size: 1em; transition: all 0.3s ease; }
 
   /* 🟡 Uiverse.io Add to Cart Button */
   button {
@@ -124,20 +98,16 @@
   .card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border-color: rgba(124,58,237,0.2); }
   .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
   .card:hover .card__glow { opacity: 1; }
-  .card:hover .card__badge { transform: scale(1); opacity: 1; z-index: 1; }
-  .card:hover .card__image { transform: translateY(-5px) scale(1.03); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-  .card:hover .card__title { color: var(--card-accent); transform: translateX(2px); }
-  .card:hover .card__description { opacity: 1; transform: translateX(2px); }
-  .card:hover .card__price { color: var(--card-accent); transform: translateX(2px); }
 
   @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
 
-  /* 📱 Mobile: 2 per row */
+  /* Mobile friendly adjustments */
   @media (max-width: 768px) {
-    .products {
-      justify-content: center;
-      gap: 15px;
-    }
+    .products { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 769px) {
+    .products { grid-template-columns: repeat(4, 1fr); }
   }
 </style>
 </head>
@@ -153,7 +123,6 @@
 <script>
 let allProducts = [];
 
-// Load products and render grid
 fetch('products.json')
   .then(res => res.json())
   .then(products => {
@@ -166,7 +135,7 @@ fetch('products.json')
         <div class="card__shine"></div>
         <div class="card__glow"></div>
         <div class="card__content">
-          <div class="card__image"><img src="${p.image}" alt="${p.name}" style="width:100%; height:100%; border-radius:12px;"></div>
+          <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
           <div class="card__text">
             <h3 class="card__title">${p.name}</h3>
             <p class="card__description">$${(p.price/100).toFixed(2)}</p>
@@ -180,7 +149,6 @@ fetch('products.json')
     });
   });
 
-// Add to cart
 function addToCart(productId){
   const product = allProducts.find(p=>p.id===productId);
   if(!product) return;
@@ -193,7 +161,6 @@ function addToCart(productId){
   updateCartCount();
 }
 
-// Cart counter
 function updateCartCount(){
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
   const total = cart.reduce((sum,i)=>sum+i.quantity,0);
