@@ -5,182 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Page</title>
 <style>
-   /* 🌐 Base Styles */
-  body { 
-    font-family: "Helvetica Neue", Arial, sans-serif; 
-    margin: 0; 
-    background: #fafafa; 
-    color: #333;
-  }
+  /* Base Styles */
+  body { font-family: "Helvetica Neue", Arial, sans-serif; margin:0; background:#fafafa; color:#333; }
 
-  /* 🔝 Sticky Header */
-  .header { 
-    position: sticky; 
-    top: 0; 
-    background: #fff; 
-    padding: 12px 20px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
-    z-index: 1000;
-  }
-  .logo { 
-    font-weight: bold; 
-    font-size: 1.2rem; 
-    text-decoration: none; 
-    color: #222; 
-  }
-  .cart { 
-    position: relative; 
-    font-size: 1.4rem; 
-    text-decoration: none;
-    color: #444;
-  }
-  #cart-count { 
-    position: absolute; 
-    top: -8px; 
-    right: -10px; 
-    background: #f1641e; 
-    color: #fff; 
-    border-radius: 50%; 
-    padding: 2px 7px; 
-    font-size: 12px; 
-    font-weight: bold;
-  }
+  /* Header */
+  .header { position: sticky; top:0; background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 6px rgba(0,0,0,0.08); z-index:1000; }
+  .logo { font-weight:bold; font-size:1.2rem; text-decoration:none; color:#222; }
+  .cart { position:relative; font-size:1.4rem; text-decoration:none; color:#444; }
+  #cart-count { position:absolute; top:-8px; right:-10px; background:#f1641e; color:#fff; border-radius:50%; padding:2px 7px; font-size:12px; font-weight:bold; }
 
-  /* Product Section */
-  .product-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px auto;
-    max-width: 100%;
-    width: 100%;
-    padding: 0 10px;
-    box-sizing: border-box;
-  }
-
-  .product-image-wrapper {
-    width: 100%;
+  /* Card Styles (Uiverse.io) */
+  .card {
+    --accent-color: #ffd426;
     position: relative;
-  }
-  #product-image {
-    width: 100%;
-    border-radius: 10px;
-    max-width: 100%;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 15px;
-    display: block;
-  }
-  .heart.always {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 36px; height: 36px;
+    width: 240px;
     background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    border-radius: 1rem;
+    padding: 0.3rem;
+    box-shadow: rgba(100,100,111,0.2) 0px 50px 30px -20px;
+    transition: all 0.5s ease-in-out;
+    margin: 20px auto;
   }
-
-  /* Price & Title */
-  #product-price {
-    font-size: 36px; /* 50% bigger */
-    font-weight: bold;
-    color: #111;
+  .card .image-container {
+    position: relative;
     width: 100%;
-    text-align: left;
-    margin-bottom: 10px;
+    height: 130px;
+    border-radius: 0.7rem;
+    border-top-right-radius: 4rem;
+    margin-bottom: 1rem;
   }
-  #product-name {
-    font-size: 22px;
-    font-weight: normal;
-    margin-bottom: 20px;
-    text-align: left;
-    width: 100%;
-  }
+  .card .image-container img { width:100%; height:100%; object-fit:cover; border-radius:inherit; }
+  .card .content { padding:0 0.8rem; margin-bottom:1rem; }
+  .card .content .product-name { font-weight:700; color:#666; font-size:0.7rem; margin-bottom:1rem; }
+  .card .button-container { display:flex; gap:0.3rem; margin-bottom:10px; }
+  .card .button-container .button { border-radius:1.4rem 1.4rem 0.7rem 0.7rem; border:none; padding:0.5rem 0; background:var(--accent-color); color:white; font-weight:900; cursor:pointer; }
+  .card .button-container .button:hover { background: orangered; }
+  .card .button-container .buy-button { flex:auto; }
+  .card .button-container .cart-button { display:grid; place-content:center; width:50px; }
 
-  /* Buttons */
-  .btn {
-    width: 100%;
-    padding: 16px;
-    margin-bottom: 12px;
-    font-size: 18px;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  @media (max-width:480px){
+    .card { width: 90%; }
   }
-  .add-to-cart {
-    background: #f1641e;
-    color: #fff;
-  }
-  .add-to-cart:hover { background: #d9550e; }
-  .checkout-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    background: #ff8c42;
-    color: #fff;
-  }
-  .checkout-btn:hover { background: #e57a25; }
-  .checkout-btn img { width: 24px; height: 24px; }
-
-  /* Checkout Wrapper */
-  .checkout-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  select#payment-method {
-    padding: 14px;
-    border-radius: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    appearance: none;
-  }
-
-  /* Description */
-  .details {
-    max-width: 100%;
-    margin: 20px auto 60px;
-    padding: 20px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    box-sizing: border-box;
-  }
-  .details h2 { font-size: 22px; margin-bottom: 10px; }
-  .details p { font-size: 16px; line-height: 1.6; color: #555; }
-
-  @media (max-width: 480px) {
-    #product-price { font-size: 32px; }
-    #product-name { font-size: 20px; }
-    .btn { font-size: 16px; padding: 14px; border-radius: 25px; }
-    .hamburger { display: flex; }
-  }
-
-/* Desktop: keep content centered and not too wide */
-@media (min-width: 769px) {
-  .product-container,
-  .details {
-    max-width: 800px;   /* narrower on desktop */
-    margin: 20px auto;  /* center horizontally */
-  }
-
-  .search-bar {
-    max-width: 300px;   /* search bar doesn’t stretch across huge screens */
-  }
-}
 </style>
 </head>
 <body>
@@ -217,15 +82,19 @@ function renderProduct() {
 
   const container = document.getElementById('product-container');
   container.innerHTML = `
-    <div class="product-image">
-      <img src="${product.image}" alt="${product.name}">
-    </div>
-    <div class="product-info">
-      <h1>${product.name}</h1>
-      <p>${product.description || 'No description available.'}</p>
-      <p><strong>$${(product.price/100).toFixed(2)}</strong></p>
-      <button class="btn" onclick="addToCart('${product.id}')">Add to Cart</button>
-      <button class="btn" onclick="buyNow('${product.id}')">Buy Now</button>
+    <div class="card">
+      <div class="image-container">
+        <img src="${product.image}" alt="${product.name}">
+      </div>
+      <div class="content">
+        <div class="product-name">${product.name}</div>
+        <div class="price">$${(product.price/100).toFixed(2)}</div>
+        <div class="button-container">
+          <button class="button buy-button" onclick="buyNow('${product.id}')">Buy Now</button>
+          <button class="button cart-button" onclick="addToCart('${product.id}')">🛒</button>
+        </div>
+        <p>${product.description || 'No description available.'}</p>
+      </div>
     </div>
   `;
 }
