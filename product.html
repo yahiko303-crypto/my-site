@@ -30,26 +30,24 @@
   .card .image-container {
     position: relative;
     width: 100%;
-    height: 130px;
     border-radius: 0.7rem;
     border-top-right-radius: 4rem;
     margin-bottom: 1rem;
-    overflow: hidden; /* ensures rounded corners */
+    overflow: visible; /* allow price to float outside */
   }
 
   .card .image-container img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: inherit;
+    height: auto; /* natural height, no cropping */
     display: block;
+    border-radius: inherit;
   }
 
   /* Floating price badge */
   .card .image-container .price {
     position: absolute;
     right: 0.7rem;
-    bottom: -0.7rem; /* float it down to hang over the card */
+    bottom: -0.8rem; /* float down over card */
     background: white;
     color: var(--accent-color);
     font-weight: 900;
