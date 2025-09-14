@@ -41,6 +41,22 @@
     height: auto; /* preserves aspect ratio */
     display: block;
     border-radius: inherit;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .card .price {
+    position: absolute;
+    right: 0.7rem;
+    bottom: -1rem;
+    background: white;
+    color: var(--accent-color);
+    font-weight: 900;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    border-radius: 1rem 1rem 2rem 2rem;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 15px 0px;
   }
 
   .card .content { padding:0 0.8rem; margin-bottom:1rem; }
@@ -78,6 +94,7 @@ fetch('products.json')
     renderProduct();
   });
 
+// Render product on the page
 function renderProduct() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
@@ -92,11 +109,11 @@ function renderProduct() {
   container.innerHTML = `
     <div class="card">
       <div class="image-container">
-        <img src="${product.image}" alt="${product.name}">
+        <img src="${product.image}" alt="${product.name}" draggable="false">
+        <div class="price">$${(product.price/100).toFixed(2)}</div>
       </div>
       <div class="content">
         <div class="product-name">${product.name}</div>
-        <div class="price">$${(product.price/100).toFixed(2)}</div>
         <div class="button-container">
           <button class="button buy-button" onclick="buyNow('${product.id}')">Buy Now</button>
           <button class="button cart-button" onclick="addToCart('${product.id}')">🛒</button>
@@ -135,6 +152,14 @@ function updateCartCount(){
 }
 
 updateCartCount();
+
+// Prevent right-click on images
+document.addEventListener('contextmenu', function(e) {
+  if(e.target.tagName === 'IMG') {
+    e.preventDefault();
+    alert('Saving images is disabled on this page.');
+  }
+});
 </script>
 
 </body>
