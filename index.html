@@ -50,25 +50,25 @@
 
   /* 🛍 Product Grid */
   .products {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 per row */
-  gap: 20px;
-  margin: 20px auto;
-  max-width: 1400px; /* keeps the grid from being too wide */
-  justify-content: center;
-}
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 per row */
+    gap: 20px;
+    margin: 20px auto;
+    max-width: 1400px; /* keeps the grid from being too wide */
+    justify-content: center;
+  }
 
-.card {
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  max-width: 300px; /* 👈 keeps each card smaller */
-  margin: 0 auto;
-}
+  .card {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width: 300px; /* 👈 keeps each card smaller */
+    margin: 0 auto;
+  }
 
   .card img {
     width: 100%;
@@ -82,15 +82,29 @@
     cursor: pointer;
   }
 
+  /* 🟡 Add to Cart Button Style */
   .btn {
-    padding: 8px 12px;
-    margin-top: auto;
-    width: 100%;
-    background: #f1641e;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
+    background: #fbca1f;
+    font-family: inherit;
+    padding: 0.6em 1.3em;
+    font-weight: 900;
+    font-size: 18px;
+    border: 3px solid black;
+    border-radius: 0.4em;
+    box-shadow: 0.1em 0.1em;
     cursor: pointer;
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .btn:hover {
+    transform: translate(-0.05em, -0.05em);
+    box-shadow: 0.15em 0.15em;
+  }
+
+  .btn:active {
+    transform: translate(0.05em, 0.05em);
+    box-shadow: 0.05em 0.05em;
   }
 
   /* 📱 Mobile: 2 per row */
