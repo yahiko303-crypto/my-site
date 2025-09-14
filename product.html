@@ -30,6 +30,7 @@
   .card .image-container {
     position: relative;
     width: 100%;
+    height: 130px;
     border-radius: 0.7rem;
     border-top-right-radius: 4rem;
     margin-bottom: 1rem;
@@ -38,18 +39,17 @@
 
   .card .image-container img {
     width: 100%;
-    height: auto; /* preserves aspect ratio */
-    display: block;
+    height: 100%;
+    object-fit: cover;
     border-radius: inherit;
-    -webkit-user-drag: none;
-    user-select: none;
-    pointer-events: none;
+    display: block;
   }
 
-  .card .price {
+  /* Floating price badge */
+  .card .image-container .price {
     position: absolute;
     right: 0.7rem;
-    bottom: -1rem;
+    bottom: -0.7rem; /* float it down to hang over the card */
     background: white;
     color: var(--accent-color);
     font-weight: 900;
@@ -57,6 +57,7 @@
     padding: 0.5rem;
     border-radius: 1rem 1rem 2rem 2rem;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 15px 0px;
+    z-index: 10;
   }
 
   .card .content { padding:0 0.8rem; margin-bottom:1rem; }
@@ -94,7 +95,6 @@ fetch('products.json')
     renderProduct();
   });
 
-// Render product on the page
 function renderProduct() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
@@ -109,7 +109,7 @@ function renderProduct() {
   container.innerHTML = `
     <div class="card">
       <div class="image-container">
-        <img src="${product.image}" alt="${product.name}" draggable="false">
+        <img src="${product.image}" alt="${product.name}">
         <div class="price">$${(product.price/100).toFixed(2)}</div>
       </div>
       <div class="content">
@@ -152,14 +152,6 @@ function updateCartCount(){
 }
 
 updateCartCount();
-
-// Prevent right-click on images
-document.addEventListener('contextmenu', function(e) {
-  if(e.target.tagName === 'IMG') {
-    e.preventDefault();
-    alert('Saving images is disabled on this page.');
-  }
-});
 </script>
 
 </body>
