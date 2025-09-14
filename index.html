@@ -101,13 +101,19 @@
 
   @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
 
-  /* Mobile friendly adjustments */
+  /* Mobile: 2 per row */
   @media (max-width: 768px) {
     .products { grid-template-columns: repeat(2, 1fr); }
   }
 
+  /* Desktop: 4 per row, smaller width and centered */
   @media (min-width: 769px) {
-    .products { grid-template-columns: repeat(4, 1fr); }
+    .products {
+      grid-template-columns: repeat(4, 1fr);
+      max-width: 1200px;  /* limits width so items aren’t at screen edge */
+      margin: 0 auto;      /* centers grid */
+      gap: 20px;
+    }
   }
 </style>
 </head>
