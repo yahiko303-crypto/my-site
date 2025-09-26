@@ -1,48 +1,66 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ cartOpen: false }">
+<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Page — DjsDopeDesigns</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-  <style>
-    /* Floating cart transition */
-    .cart-slide { transition: transform 0.3s ease-in-out; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Page</title>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* optional custom styling */
+</style>
 </head>
-<body class="bg-gray-100">
+<body class="font-sans">
 
 <!-- Header -->
-<header class="bg-white sticky top-0 shadow p-4 flex justify-between items-center z-50">
-  <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
-  <button @click="cartOpen = !cartOpen" class="relative text-gray-700">
-    🛒
-    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2">0</span>
-  </button>
+<header class="bg-white shadow sticky top-0 z-50">
+  <div class="container mx-auto flex justify-between items-center px-4 py-4">
+    <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
+    <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
+      🛒
+      <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
+    </button>
+  </div>
 </header>
 
-<!-- Sliding Cart -->
-<div :class="cartOpen ? 'translate-x-0' : 'translate-x-full'" class="cart-slide fixed right-0 top-0 w-80 h-full bg-white shadow-lg border-l border-gray-300 p-6 transform translate-x-full overflow-y-auto z-40">
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold">Your Cart</h2>
-    <button @click="cartOpen = false" class="text-gray-600 hover:text-gray-800">✖</button>
-  </div>
-  <div id="cart-items" class="space-y-4"></div>
-  <button class="w-full mt-4 bg-indigo-600 text-white py-2 rounded hover:bg-indigo-500" onclick="checkout()">Checkout</button>
+<!-- Search Bar -->
+<div class="container mx-auto px-4 py-4">
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Search products..." 
+    class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    oninput="filterProducts()"
+  >
 </div>
 
-<!-- Main Content -->
-<main class="container mx-auto px-4 py-8">
-  <div id="featured-product" class="mb-12"></div>
+<!-- Featured Product -->
+<div class="container mx-auto px-4 my-4" id="featured-product"></div>
 
-  <h3 class="text-gray-700 text-xl font-semibold mb-4">Other Products</h3>
+<!-- Other Products -->
+<div class="container mx-auto px-4 mt-8">
   <div id="other-products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-</main>
+</div>
+
+<!-- Sliding Cart -->
+<div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" 
+     class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-white border-l-2 border-gray-300 overflow-y-auto z-50">
+  <div class="flex justify-between items-center">
+    <h3 class="text-2xl font-medium text-gray-700">Your cart</h3>
+    <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">
+      ✕
+    </button>
+  </div>
+  <hr class="my-3">
+  <div id="cart-items" class="space-y-6"></div>
+  <div class="mt-8 flex justify-center">
+    <a href="cart.html" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+  </div>
+</div>
 
 <script>
-// Your products data
-const products = [
+// Product data
+let products = [
   {"id":"1","name":"Drake Dancing","price":50,"image":"images/1drake-dancing.gif","description":"Drake doing the hotline."},
   {"id":"2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","description":"Hammer Girl in action."},
   {"id":"3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","description":"Funny dancing guy."},
@@ -50,25 +68,78 @@ const products = [
   {"id":"5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","description":"Death Drummer rocking."}
 ];
 
-// Helper functions
-function getProductById(id) {
-  return products.find(p => p.id === id);
+// Get featured product id from URL
+const params = new URLSearchParams(window.location.search);
+const featuredId = params.get('id') || "1";
+
+// Render featured product
+function renderFeatured() {
+  const featured = products.find(p => p.id === featuredId);
+  const container = document.getElementById("featured-product");
+  container.innerHTML = `
+    <div class="bg-white p-4 rounded-lg shadow-md md:flex md:items-center">
+      <div class="w-full md:w-1/2">
+        <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
+      </div>
+      <div class="mt-4 md:mt-0 md:ml-6 md:w-1/2">
+        <h2 class="text-xl font-bold text-gray-700">${featured.name}</h2>
+        <p class="text-gray-500 my-2">$${featured.price}</p>
+        <p class="text-gray-600 mb-4">${featured.description}</p>
+        <div class="flex space-x-2">
+          <button onclick="buyNow('${featured.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Order Now</button>
+          <button onclick="addToCart('${featured.id}')" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">🛒</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Render other products
+function renderOtherProducts(filteredProducts) {
+  const otherContainer = document.getElementById("other-products");
+  otherContainer.innerHTML = '';
+  filteredProducts.forEach(p => {
+    if(p.id === featuredId) return; // skip featured
+    const div = document.createElement('div');
+    div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center";
+    div.innerHTML = `
+      <div class="w-full aspect-w-1 aspect-h-1 mb-2">
+        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
+      </div>
+      <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
+      <div class="text-sm text-gray-500 mb-2">$${p.price}</div>
+      <div class="flex space-x-2">
+        <a href="?id=${p.id}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
+        <button onclick="addToCart('${p.id}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
+      </div>
+    `;
+    otherContainer.appendChild(div);
+  });
+}
+
+// Filter products by search
+function filterProducts() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = products.filter(p => 
+    p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)
+  );
+  renderOtherProducts(filtered);
 }
 
 // Cart functions
-function addToCart(productId){
-  const product = getProductById(productId);
+function addToCart(id){
+  const product = products.find(p => p.id === id);
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i => i.id === productId);
+  const existing = cart.find(i => i.id === id);
   if(existing) existing.quantity++;
   else cart.push({id: product.id, name: product.name, price: product.price, quantity:1, image: product.image});
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartCount();
-  renderCart();
+  renderCartItems();
 }
 
-function buyNow(productId){
-  addToCart(productId);
+function buyNow(id){
+  addToCart(id);
   window.location.href = 'cart.html';
 }
 
@@ -78,71 +149,27 @@ function updateCartCount(){
   document.getElementById("cart-count").textContent = total;
 }
 
-function renderCart(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+function renderCartItems() {
   const container = document.getElementById("cart-items");
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
   container.innerHTML = '';
   cart.forEach(item => {
     const div = document.createElement('div');
-    div.className = "flex justify-between items-center";
+    div.className = "flex items-center justify-between";
     div.innerHTML = `
-      <div class="flex items-center">
-        <img src="${item.image}" class="w-12 h-12 object-cover rounded mr-2">
-        <div>
-          <div class="text-sm font-medium">${item.name}</div>
-          <div class="text-xs text-gray-500">$${item.price} x ${item.quantity}</div>
-        </div>
-      </div>
+      <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
+      <div class="ml-2 flex-1">${item.name} x ${item.quantity}</div>
       <div>$${item.price * item.quantity}</div>
     `;
     container.appendChild(div);
   });
 }
 
-function checkout(){
-  alert("Proceeding to checkout...");
-}
-
-// Render Featured Product
-const params = new URLSearchParams(window.location.search);
-const featuredId = params.get('id') || '1';
-const featured = getProductById(featuredId);
-
-const featuredContainer = document.getElementById("featured-product");
-featuredContainer.innerHTML = `
-<div class="bg-white p-6 rounded-lg shadow-md md:flex md:items-center">
-  <img src="${featured.image}" alt="${featured.name}" class="w-full md:w-1/2 rounded-lg mb-4 md:mb-0">
-  <div class="md:ml-6">
-    <h2 class="text-2xl font-bold mb-2">${featured.name}</h2>
-    <p class="text-gray-600 mb-2">${featured.description}</p>
-    <div class="text-xl font-semibold mb-4">$${featured.price}</div>
-    <div class="flex space-x-2">
-      <button onclick="buyNow('${featured.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Order Now</button>
-      <button onclick="addToCart('${featured.id}')" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">🛒</button>
-    </div>
-  </div>
-</div>
-`;
-
-// Render Other Products
-const otherContainer = document.getElementById("other-products");
-products.filter(p => p.id !== featuredId).forEach(p => {
-  const div = document.createElement('div');
-  div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center";
-  div.innerHTML = `
-    <img src="${p.image}" alt="${p.name}" class="w-full h-32 object-cover mb-2 rounded">
-    <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
-    <div class="text-sm text-gray-500 mb-2">$${p.price}</div>
-    <div class="flex space-x-2">
-      <a href="?id=${p.id}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
-      <button onclick="addToCart('${p.id}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
-    </div>
-  `;
-  otherContainer.appendChild(div);
-});
-
+// Initial render
+renderFeatured();
+renderOtherProducts(products.filter(p => p.id !== featuredId));
 updateCartCount();
-renderCart();
+renderCartItems();
 </script>
 
 </body>
