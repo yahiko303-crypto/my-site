@@ -1,133 +1,202 @@
 <!DOCTYPE html>
-<html lang="en" x-data="productPage()">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DjsDopeDesigns — Product</title>
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+<title>DjsDopeDesigns - Products</title>
 <style>
-  /* Optional: Smooth sliding cart */
-  .cart-panel { transition: transform 0.3s ease-in-out; }
+  body { 
+    font-family: "Helvetica Neue", Arial, sans-serif; 
+    margin: 0; 
+    background: #fafafa; 
+    color: #333;
+  }
+
+  /* 🔝 Sticky Header */
+  .header { 
+    position: sticky; 
+    top: 0; 
+    background: #fff; 
+    padding: 12px 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
+    z-index: 1000;
+  }
+  .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
+  .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
+  #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
+
+  /* 🔍 Search bar */
+  #search-bar {
+    display: block;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 400px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+
+  /* 🛍 Product Grid */
+  .products {
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  /* 🟣 Card Style */
+  .card {
+    --card-bg: #ffffff;
+    --card-accent: #7c3aed;
+    --card-text: #1e293b;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+
+    background: var(--card-bg);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card__shine { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%); opacity: 0; transition: opacity 0.3s ease; }
+  .card__glow { position: absolute; inset: -10px; background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.3) 0%, rgba(124,58,237,0) 70%); opacity: 0; transition: opacity 0.5s ease; }
+
+  .card__content { padding: 1.25em; display: flex; flex-direction: column; gap: 0.75em; position: relative; z-index: 2; flex: 1 1 auto; }
+
+  .card__image { width: 100%; flex-shrink: 0; border-radius: 12px; overflow: hidden; max-height: 140px; }
+  .card__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .card__text { display: flex; flex-direction: column; gap: 0.25em; }
+  .card__title { color: var(--card-text); font-size: 1.1em; margin: 0; font-weight: 700; transition: all 0.3s ease; }
+  .card__description { color: var(--card-text); font-size: 0.75em; margin: 0; opacity: 0.7; transition: all 0.3s ease; }
+
+  .card__footer { display: flex; justify-content: center; align-items: center; margin-top: auto; }
+
+  button {
+    --button_radius: 0.75em;
+    --button_color: #e8e8e8;
+    --button_outline_color: #000000;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--button_radius);
+    background: var(--button_outline_color);
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .button_top { display: block; width: 100%; text-align: center; color: white; transform: scale(0.9); transition: all 0.3s ease; }
+  button:hover .button_top { transform: scale(1); }
+  button:active .button_top { transform: scale(0.95); }
+
+  .card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border-color: rgba(124,58,237,0.2); }
+  .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
+  .card:hover .card__glow { opacity: 1; }
+
+  @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+
+  @media (max-width: 768px) {
+    .products { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 769px) {
+    .products { grid-template-columns: repeat(4, 1fr); max-width: 1200px; margin: 0 auto; gap: 20px; }
+    .card__image { max-height: none; flex-grow: 1; }
+  }
 </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body>
 
-<!-- Header -->
-<header class="sticky top-0 bg-white shadow z-50 flex justify-between items-center px-6 py-3">
-  <a href="index.html" class="text-2xl font-bold text-gray-900">DjsDopeDesigns</a>
-  <div class="flex items-center space-x-4">
-    <input type="text" x-model="searchQuery" placeholder="Search products..." class="border rounded px-3 py-1 focus:outline-none focus:ring w-48">
-    <button @click="toggleCart()" class="relative text-gray-700 text-2xl">🛒
-      <span class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full px-2 text-xs" x-text="cartCount"></span>
-    </button>
-  </div>
+<header class="header">
+  <a href="index.html" class="logo">DjsDopeDesigns</a>
+  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
 
-<!-- Main product -->
-<main class="max-w-6xl mx-auto px-4 py-8">
-  <section class="flex flex-col md:flex-row md:space-x-8 items-center mb-12" x-show="mainProduct">
-    <div class="flex-1">
-      <img :src="mainProduct.image" :alt="mainProduct.name" class="w-full rounded-lg shadow-lg object-contain max-h-[400px]">
-    </div>
-    <div class="flex-1 mt-6 md:mt-0">
-      <h1 class="text-3xl font-bold mb-2" x-text="mainProduct.name"></h1>
-      <p class="text-xl text-gray-800 mb-4">$<span x-text="(mainProduct.price/100).toFixed(2)"></span></p>
-      <p class="text-gray-700 mb-6" x-text="mainProduct.description"></p>
-      <button @click="addToCart(mainProduct.id)" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">Order Now 🛒</button>
-    </div>
-  </section>
+<input type="text" id="search-bar" placeholder="Search products..." />
 
-  <!-- Other Products -->
-  <section>
-    <h2 class="text-2xl font-bold mb-4">Other Products</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-      <template x-for="product in filteredProducts()" :key="product.id">
-        <div class="bg-white rounded-lg shadow p-4 flex flex-col">
-          <img :src="product.image" :alt="product.name" class="w-full h-40 object-contain mb-3">
-          <h3 class="font-semibold text-lg mb-1" x-text="product.name"></h3>
-          <p class="text-gray-700 mb-3">$<span x-text="(product.price/100).toFixed(2)"></span></p>
-          <div class="mt-auto flex space-x-2">
-            <a :href="'product.html?id=' + product.id" class="flex-1 text-center bg-gray-200 text-gray-900 rounded py-1 hover:bg-gray-300 transition">View</a>
-            <button @click="addToCart(product.id)" class="flex-1 bg-purple-600 text-white rounded py-1 hover:bg-purple-700 transition">Add</button>
-          </div>
-        </div>
-      </template>
-    </div>
-  </section>
-</main>
-
-<!-- Sliding Cart Panel -->
-<div class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full cart-panel" x-bind:class="{'translate-x-0': cartOpen}">
-  <div class="p-4 flex justify-between items-center border-b">
-    <h2 class="text-xl font-bold">Your Cart</h2>
-    <button @click="toggleCart()" class="text-gray-600 text-xl">&times;</button>
-  </div>
-  <div class="p-4 overflow-y-auto h-[calc(100%-64px)]">
-    <template x-for="item in cartItems" :key="item.id">
-      <div class="flex items-center mb-4">
-        <img :src="item.image" :alt="item.name" class="w-16 h-16 object-contain rounded mr-3">
-        <div class="flex-1">
-          <h3 class="font-semibold" x-text="item.name"></h3>
-          <p>$<span x-text="item.price.toFixed(2)"></span> × <span x-text="item.quantity"></span></p>
-        </div>
-      </div>
-    </template>
-    <p x-show="cartItems.length===0" class="text-gray-500">Cart is empty</p>
-  </div>
-</div>
+<section class="products" id="product-grid"></section>
 
 <script>
-function productPage() {
-  return {
-    allProducts: [],
-    mainProduct: null,
-    searchQuery: '',
-    cartItems: JSON.parse(localStorage.getItem("cart")) || [],
-    cartOpen: false,
-    cartCount: 0,
-    init() {
-      this.fetchProducts();
-      this.updateCartCount();
-    },
-    fetchProducts() {
-      fetch('products.json')
-        .then(res => res.json())
-        .then(products => {
-          this.allProducts = products;
-          const params = new URLSearchParams(window.location.search);
-          const id = params.get('id') || products[0].id;
-          this.mainProduct = products.find(p => p.id === id);
-        });
-    },
-    filteredProducts() {
-      if(!this.searchQuery) {
-        return this.allProducts.filter(p => p.id !== this.mainProduct.id);
-      }
-      return this.allProducts.filter(p => 
-        p.id !== this.mainProduct.id &&
-        p.name.toLowerCase().startsWith(this.searchQuery.toLowerCase())
-      );
-    },
-    addToCart(productId) {
-      const product = this.allProducts.find(p => p.id === productId);
-      if(!product) return;
-      const existing = this.cartItems.find(i => i.id === productId);
-      if(existing) existing.quantity++;
-      else this.cartItems.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
-      localStorage.setItem("cart", JSON.stringify(this.cartItems));
-      this.updateCartCount();
-      alert(`${product.name} added to cart!`);
-    },
-    updateCartCount() {
-      this.cartCount = this.cartItems.reduce((sum,i)=>sum+i.quantity,0);
-    },
-    toggleCart() {
-      this.cartOpen = !this.cartOpen;
-    }
-  }
-}
-</script>
+let allProducts = [];
 
+// Load products from your JSON
+fetch('products.json')
+  .then(res => res.json())
+  .then(products => {
+    allProducts = products;
+    renderProducts(allProducts);
+  });
+
+function renderProducts(products) {
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = '';
+  products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+  <a href="product.html?id=${p.id}" style="text-decoration:none; color:inherit;">
+    <div class="card__shine"></div>
+    <div class="card__glow"></div>
+    <div class="card__content">
+      <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
+      <div class="card__text">
+        <h3 class="card__title">${p.name}</h3>
+        <p class="card__description">$${(p.price/100).toFixed(2)}</p>
+      </div>
+      <div class="card__footer">
+        <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
+      </div>
+    </div>
+  </a>
+`;
+    grid.appendChild(card);
+  });
+}
+
+// 🔄 Add search functionality
+document.getElementById('search-bar').addEventListener('input', function() {
+  const query = this.value.trim().toLowerCase();
+  if(query === '') renderProducts(allProducts);
+  else {
+    const filtered = allProducts.filter(p => p.name.toLowerCase().startsWith(query));
+    renderProducts(filtered);
+  }
+});
+
+// 🔄 Cart functionality
+function addToCart(productId){
+  const product = allProducts.find(p=>p.id===productId);
+  if(!product) return;
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const existing = cart.find(i=>i.id===productId);
+  if(existing) existing.quantity++;
+  else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert(`${product.name} added to cart!`);
+  updateCartCount();
+}
+
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
+  document.getElementById("cart-count").textContent = total;
+}
+updateCartCount();
+</script>
 </body>
 </html>
