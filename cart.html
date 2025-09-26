@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
+<html lang="en" x-data="{ cartOpen: false }" class="bg-gradient-to-r from-green-100 to-blue-100 min-h-screen">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Cart — DjsDopeDesigns</title>
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart — DjsDopeDesigns</title>
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="font-sans">
+<body class="font-sans bg-gradient-to-r from-green-100 to-blue-100 min-h-screen flex flex-col">
 
 <!-- Header -->
 <header class="bg-white shadow sticky top-0 z-50">
@@ -20,7 +20,7 @@
   </div>
 </header>
 
-<main class="container mx-auto px-4 py-6">
+<main class="container mx-auto px-4 py-6 flex-grow">
   <h1 class="text-2xl font-bold mb-4 text-gray-700">Your Cart</h1>
   <div id="cart-items" class="space-y-4"></div>
 
@@ -29,6 +29,11 @@
     <button id="checkout-btn" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</button>
   </div>
 </main>
+
+<!-- Optional footer -->
+<footer class="bg-gradient-to-r from-green-100 to-blue-100 py-6 text-center text-gray-700">
+  © 2025 DjsDopeDesigns — All Rights Reserved
+</footer>
 
 <script>
 // Load cart from localStorage
