@@ -188,6 +188,9 @@ function renderCartItems() {
   container.innerHTML = '';
 
   cart.forEach((item, index) => {
+    const itemTotal = (item.price * item.quantity).toFixed(2);
+    total += parseFloat(itemTotal);
+
     const div = document.createElement('div');
     div.className = "flex items-center justify-between bg-gray-50 p-2 rounded shadow";
     div.innerHTML = `
