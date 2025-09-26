@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Page</title>
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="style.css"> <!-- your custom CSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Page</title>
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css"> <!-- your custom CSS -->
 </head>
 <body class="font-sans bg-gradient-to-r from-green-200 to-blue-200 min-h-screen">
 
@@ -22,7 +22,7 @@
 </header>
 
 <!-- Search Bar -->
-<div class="container mx-auto px-4 py-4">
+<div class="container mx-auto px-4 py-4 relative">
   <input 
     type="text" 
     id="searchInput" 
@@ -30,6 +30,8 @@
     class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
     oninput="filterProducts()"
   >
+  <!-- Search Preview Dropdown -->
+  <div id="searchPreview" class="absolute bg-white border border-gray-200 rounded shadow-md mt-1 w-full md:w-1/2 hidden z-50"></div>
 </div>
 
 <!-- Featured Product -->
@@ -121,12 +123,40 @@ function renderOtherProducts(filteredProducts) {
   });
 }
 
-// Filter products by search
+// Filter products by search + preview dropdown
 function filterProducts() {
   const query = document.getElementById("searchInput").value.toLowerCase();
+  const preview = document.getElementById("searchPreview");
+
+  if (!query) {
+    preview.classList.add("hidden");
+    return;
+  }
+
   const filtered = products.filter(p => p.name.toLowerCase().startsWith(query));
-  renderOtherProducts(filtered);
+  
+  if(filtered.length === 0) {
+    preview.innerHTML = `<div class="p-2 text-gray-500">No results</div>`;
+  } else {
+    preview.innerHTML = filtered.map(p => `
+      <a href="?id=${p.id}" 
+         class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
+         onclick="document.getElementById('searchPreview').classList.add('hidden')">
+        <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-contain rounded">
+        <span class="text-gray-700">${p.name}</span>
+      </a>
+    `).join("");
+  }
+  preview.classList.remove("hidden");
 }
+
+// Hide preview when clicking outside
+document.addEventListener("click", (e) => {
+  if (!document.getElementById("searchInput").contains(e.target) &&
+      !document.getElementById("searchPreview").contains(e.target)) {
+    document.getElementById("searchPreview").classList.add("hidden");
+  }
+});
 
 // Cart functions
 function addToCart(id){
