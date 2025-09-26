@@ -1,175 +1,132 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
+<html lang="en" x-data="productPage()">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Page</title>
-<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>DjsDopeDesigns — Product</title>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
 <style>
-/* optional custom styling */
+  /* Optional: Smooth sliding cart */
+  .cart-panel { transition: transform 0.3s ease-in-out; }
 </style>
 </head>
-<body class="font-sans">
+<body class="bg-gray-50 font-sans">
 
 <!-- Header -->
-<header class="bg-white shadow sticky top-0 z-50">
-  <div class="container mx-auto flex justify-between items-center px-4 py-4">
-    <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
-    <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
-      🛒
-      <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
+<header class="sticky top-0 bg-white shadow z-50 flex justify-between items-center px-6 py-3">
+  <a href="index.html" class="text-2xl font-bold text-gray-900">DjsDopeDesigns</a>
+  <div class="flex items-center space-x-4">
+    <input type="text" x-model="searchQuery" placeholder="Search products..." class="border rounded px-3 py-1 focus:outline-none focus:ring w-48">
+    <button @click="toggleCart()" class="relative text-gray-700 text-2xl">🛒
+      <span class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full px-2 text-xs" x-text="cartCount"></span>
     </button>
   </div>
 </header>
 
-<!-- Search Bar -->
-<div class="container mx-auto px-4 py-4">
-  <input 
-    type="text" 
-    id="searchInput" 
-    placeholder="Search products..." 
-    class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-    oninput="filterProducts()"
-  >
-</div>
+<!-- Main product -->
+<main class="max-w-6xl mx-auto px-4 py-8">
+  <section class="flex flex-col md:flex-row md:space-x-8 items-center mb-12" x-show="mainProduct">
+    <div class="flex-1">
+      <img :src="mainProduct.image" :alt="mainProduct.name" class="w-full rounded-lg shadow-lg object-contain max-h-[400px]">
+    </div>
+    <div class="flex-1 mt-6 md:mt-0">
+      <h1 class="text-3xl font-bold mb-2" x-text="mainProduct.name"></h1>
+      <p class="text-xl text-gray-800 mb-4">$<span x-text="(mainProduct.price/100).toFixed(2)"></span></p>
+      <p class="text-gray-700 mb-6" x-text="mainProduct.description"></p>
+      <button @click="addToCart(mainProduct.id)" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">Order Now 🛒</button>
+    </div>
+  </section>
 
-<!-- Featured Product -->
-<div class="container mx-auto px-4 my-4" id="featured-product"></div>
+  <!-- Other Products -->
+  <section>
+    <h2 class="text-2xl font-bold mb-4">Other Products</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+      <template x-for="product in filteredProducts()" :key="product.id">
+        <div class="bg-white rounded-lg shadow p-4 flex flex-col">
+          <img :src="product.image" :alt="product.name" class="w-full h-40 object-contain mb-3">
+          <h3 class="font-semibold text-lg mb-1" x-text="product.name"></h3>
+          <p class="text-gray-700 mb-3">$<span x-text="(product.price/100).toFixed(2)"></span></p>
+          <div class="mt-auto flex space-x-2">
+            <a :href="'product.html?id=' + product.id" class="flex-1 text-center bg-gray-200 text-gray-900 rounded py-1 hover:bg-gray-300 transition">View</a>
+            <button @click="addToCart(product.id)" class="flex-1 bg-purple-600 text-white rounded py-1 hover:bg-purple-700 transition">Add</button>
+          </div>
+        </div>
+      </template>
+    </div>
+  </section>
+</main>
 
-<!-- Other Products -->
-<div class="container mx-auto px-4 mt-8">
-  <div id="other-products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-</div>
-
-<!-- Sliding Cart -->
-<div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" 
-     class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-white border-l-2 border-gray-300 overflow-y-auto z-50">
-  <div class="flex justify-between items-center">
-    <h3 class="text-2xl font-medium text-gray-700">Your cart</h3>
-    <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">
-      ✕
-    </button>
+<!-- Sliding Cart Panel -->
+<div class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full cart-panel" x-bind:class="{'translate-x-0': cartOpen}">
+  <div class="p-4 flex justify-between items-center border-b">
+    <h2 class="text-xl font-bold">Your Cart</h2>
+    <button @click="toggleCart()" class="text-gray-600 text-xl">&times;</button>
   </div>
-  <hr class="my-3">
-  <div id="cart-items" class="space-y-6"></div>
-  <div class="mt-8 flex justify-center">
-    <a href="cart.html" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+  <div class="p-4 overflow-y-auto h-[calc(100%-64px)]">
+    <template x-for="item in cartItems" :key="item.id">
+      <div class="flex items-center mb-4">
+        <img :src="item.image" :alt="item.name" class="w-16 h-16 object-contain rounded mr-3">
+        <div class="flex-1">
+          <h3 class="font-semibold" x-text="item.name"></h3>
+          <p>$<span x-text="item.price.toFixed(2)"></span> × <span x-text="item.quantity"></span></p>
+        </div>
+      </div>
+    </template>
+    <p x-show="cartItems.length===0" class="text-gray-500">Cart is empty</p>
   </div>
 </div>
 
 <script>
-// Product data
-let products = [
-  {"id":"1","name":"Drake Dancing","price":50,"image":"images/1drake-dancing.gif","description":"Drake doing the hotline."},
-  {"id":"2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","description":"Hammer Girl in action."},
-  {"id":"3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","description":"Funny dancing guy."},
-  {"id":"4","name":"Green Dancer","price":350,"image":"images/4green-dancer.gif","description":"Green dancer animation."},
-  {"id":"5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","description":"Death Drummer rocking."}
-];
-
-// Get featured product id from URL
-const params = new URLSearchParams(window.location.search);
-const featuredId = params.get('id') || "1";
-
-// Render featured product
-function renderFeatured() {
-  const featured = products.find(p => p.id === featuredId);
-  const container = document.getElementById("featured-product");
-  container.innerHTML = `
-    <div class="bg-white p-4 rounded-lg shadow-md md:flex md:items-center">
-      <div class="w-full md:w-1/2">
-        <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
-      </div>
-      <div class="mt-4 md:mt-0 md:ml-6 md:w-1/2">
-        <h2 class="text-xl font-bold text-gray-700">${featured.name}</h2>
-        <p class="text-gray-500 my-2">$${featured.price}</p>
-        <p class="text-gray-600 mb-4">${featured.description}</p>
-        <div class="flex space-x-2">
-          <button onclick="buyNow('${featured.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Order Now</button>
-          <button onclick="addToCart('${featured.id}')" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">🛒</button>
-        </div>
-      </div>
-    </div>
-  `;
+function productPage() {
+  return {
+    allProducts: [],
+    mainProduct: null,
+    searchQuery: '',
+    cartItems: JSON.parse(localStorage.getItem("cart")) || [],
+    cartOpen: false,
+    cartCount: 0,
+    init() {
+      this.fetchProducts();
+      this.updateCartCount();
+    },
+    fetchProducts() {
+      fetch('products.json')
+        .then(res => res.json())
+        .then(products => {
+          this.allProducts = products;
+          const params = new URLSearchParams(window.location.search);
+          const id = params.get('id') || products[0].id;
+          this.mainProduct = products.find(p => p.id === id);
+        });
+    },
+    filteredProducts() {
+      if(!this.searchQuery) {
+        return this.allProducts.filter(p => p.id !== this.mainProduct.id);
+      }
+      return this.allProducts.filter(p => 
+        p.id !== this.mainProduct.id &&
+        p.name.toLowerCase().startsWith(this.searchQuery.toLowerCase())
+      );
+    },
+    addToCart(productId) {
+      const product = this.allProducts.find(p => p.id === productId);
+      if(!product) return;
+      const existing = this.cartItems.find(i => i.id === productId);
+      if(existing) existing.quantity++;
+      else this.cartItems.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
+      localStorage.setItem("cart", JSON.stringify(this.cartItems));
+      this.updateCartCount();
+      alert(`${product.name} added to cart!`);
+    },
+    updateCartCount() {
+      this.cartCount = this.cartItems.reduce((sum,i)=>sum+i.quantity,0);
+    },
+    toggleCart() {
+      this.cartOpen = !this.cartOpen;
+    }
+  }
 }
-
-// Render other products
-function renderOtherProducts(filteredProducts) {
-  const otherContainer = document.getElementById("other-products");
-  otherContainer.innerHTML = '';
-  filteredProducts.forEach(p => {
-    if(p.id === featuredId) return; // skip featured
-    const div = document.createElement('div');
-    div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center";
-    div.innerHTML = `
-      <div class="w-full aspect-w-1 aspect-h-1 mb-2">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
-      </div>
-      <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
-      <div class="text-sm text-gray-500 mb-2">$${p.price}</div>
-      <div class="flex space-x-2">
-        <a href="?id=${p.id}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
-        <button onclick="addToCart('${p.id}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
-      </div>
-    `;
-    otherContainer.appendChild(div);
-  });
-}
-
-// Filter products by search
-function filterProducts() {
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  const filtered = products.filter(p => 
-    p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)
-  );
-  renderOtherProducts(filtered);
-}
-
-// Cart functions
-function addToCart(id){
-  const product = products.find(p => p.id === id);
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i => i.id === id);
-  if(existing) existing.quantity++;
-  else cart.push({id: product.id, name: product.name, price: product.price, quantity:1, image: product.image});
-  localStorage.setItem("cart", JSON.stringify(cart));
-  updateCartCount();
-  renderCartItems();
-}
-
-function buyNow(id){
-  addToCart(id);
-  window.location.href = 'cart.html';
-}
-
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const total = cart.reduce((sum,i) => sum + i.quantity, 0);
-  document.getElementById("cart-count").textContent = total;
-}
-
-function renderCartItems() {
-  const container = document.getElementById("cart-items");
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  container.innerHTML = '';
-  cart.forEach(item => {
-    const div = document.createElement('div');
-    div.className = "flex items-center justify-between";
-    div.innerHTML = `
-      <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
-      <div class="ml-2 flex-1">${item.name} x ${item.quantity}</div>
-      <div>$${item.price * item.quantity}</div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-// Initial render
-renderFeatured();
-renderOtherProducts(products.filter(p => p.id !== featuredId));
-updateCartCount();
-renderCartItems();
 </script>
 
 </body>
