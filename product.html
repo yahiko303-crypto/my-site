@@ -1,156 +1,302 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Page</title>
-<style>
-  /* Base Styles */
-  body { font-family: "Helvetica Neue", Arial, sans-serif; margin:0; background:#fafafa; color:#333; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DjsDopeDesigns — Product Page</title>
 
-  /* Header */
-  .header { position: sticky; top:0; background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 6px rgba(0,0,0,0.08); z-index:1000; }
-  .logo { font-weight:bold; font-size:1.2rem; text-decoration:none; color:#222; }
-  .cart { position:relative; font-size:1.4rem; text-decoration:none; color:#444; }
-  #cart-count { position:absolute; top:-8px; right:-10px; background:#f1641e; color:#fff; border-radius:50%; padding:2px 7px; font-size:12px; font-weight:bold; }
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js (v3) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-  /* Card Styles (Uiverse.io) */
-  .card {
-    --accent-color: #ffd426;
-    position: relative;
-    width: 240px;
-    background: white;
-    border-radius: 1rem;
-    padding: 0.3rem;
-    box-shadow: rgba(100,100,111,0.2) 0px 50px 30px -20px;
-    transition: all 0.5s ease-in-out;
-    margin: 20px auto;
-  }
-
-  .card .image-container {
-    position: relative;
-    width: 100%;
-    border-radius: 0.7rem;
-    border-top-right-radius: 4rem;
-    margin-bottom: 1rem;
-    overflow: visible; /* allow price to float outside */
-  }
-
-  .card .image-container img {
-    width: 100%;
-    height: auto; /* natural height, no cropping */
-    display: block;
-    border-radius: inherit;
-  }
-
-  /* Floating price badge */
-  .card .image-container .price {
-    position: absolute;
-    right: 0.7rem;
-    bottom: -0.8rem; /* float down over card */
-    background: white;
-    color: var(--accent-color);
-    font-weight: 900;
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    border-radius: 1rem 1rem 2rem 2rem;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 0px 15px 0px;
-    z-index: 10;
-  }
-
-  .card .content { padding:0 0.8rem; margin-bottom:1rem; }
-  .card .content .product-name { font-weight:700; color:#666; font-size:0.7rem; margin-bottom:1rem; }
-  .card .button-container { display:flex; gap:0.3rem; margin-bottom:10px; }
-  .card .button-container .button { border-radius:1.4rem 1.4rem 0.7rem 0.7rem; border:none; padding:0.5rem 0; background:var(--accent-color); color:white; font-weight:900; cursor:pointer; }
-  .card .button-container .button:hover { background: orangered; }
-  .card .button-container .buy-button { flex:auto; }
-  .card .button-container .cart-button { display:grid; place-content:center; width:50px; }
-
-  @media (max-width:480px){
-    .card { width: 90%; }
-  }
-</style>
+  <style>
+    /* tiny override to keep product image aspect consistent */
+    .product-img { height: 320px; object-fit: cover; width: 100%; }
+  </style>
 </head>
-<body>
+<body class="bg-gray-50" x-data="{ cartOpen: false }">
 
-<header class="header">
-  <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
-</header>
+  <!-- Header -->
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="index.html" class="text-2xl font-extrabold text-gray-800">DjsDopeDesigns</a>
 
-<div class="product-container" id="product-container">
-  <!-- Product content will be rendered here -->
-</div>
+        <div class="flex items-center space-x-4">
+          <a href="#" class="hidden md:inline text-gray-600 hover:text-gray-800">Home</a>
+          <a href="#" class="hidden md:inline text-gray-600 hover:text-gray-800">Shop</a>
+          <a href="#" class="hidden md:inline text-gray-600 hover:text-gray-800">Contact</a>
 
-<script>
-let allProducts = [];
-
-// Load products.json to get product info
-fetch('products.json')
-  .then(res => res.json())
-  .then(products => {
-    allProducts = products;
-    renderProduct();
-  });
-
-function renderProduct() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
-  const product = allProducts.find(p => p.id === id);
-
-  if (!product) {
-    document.getElementById('product-container').innerHTML = "<p>Product not found.</p>";
-    return;
-  }
-
-  const container = document.getElementById('product-container');
-  container.innerHTML = `
-    <div class="card">
-      <div class="image-container">
-        <img src="${product.image}" alt="${product.name}">
-        <div class="price">$${(product.price/100).toFixed(2)}</div>
-      </div>
-      <div class="content">
-        <div class="product-name">${product.name}</div>
-        <div class="button-container">
-          <button class="button buy-button" onclick="buyNow('${product.id}')">Buy Now</button>
-          <button class="button cart-button" onclick="addToCart('${product.id}')">🛒</button>
+          <!-- Cart button -->
+          <button @click="cartOpen = true" aria-label="Open cart" class="relative bg-white border rounded px-3 py-2 hover:shadow">
+            <span class="text-xl">🛒</span>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">0</span>
+          </button>
         </div>
-        <p>${product.description || 'No description available.'}</p>
       </div>
     </div>
-  `;
-}
+  </header>
 
-// Add to cart
-function addToCart(productId){
-  const product = allProducts.find(p => p.id === productId);
-  if(!product) return;
+  <!-- Main -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Product detail (left) + grid below -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Featured product card -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow p-4">
+          <img id="featured-image" src="https://images.unsplash.com/photo-1578262825743-a4e402caab76?auto=format&fit=crop&w=1200&q=80" alt="Featured product" class="w-full h-64 object-cover rounded-md">
+          <div class="mt-4">
+            <h2 id="featured-name" class="text-gray-800 text-lg font-semibold">Featured Product</h2>
+            <p id="featured-price" class="text-yellow-500 font-extrabold mt-2">$99.00</p>
+            <p id="featured-desc" class="text-sm text-gray-600 mt-3">Sample highlighted product — great for spotlighting a best-seller.</p>
+            <div class="mt-4 flex gap-2">
+              <button onclick="buyNow('p1')" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Buy Now</button>
+              <button onclick="addToCart('p1')" class="px-3 py-2 border rounded hover:bg-gray-100">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i => i.id === productId);
-  if(existing) existing.quantity++;
-  else cart.push({id: product.id, name: product.name, price: product.price/100, quantity:1, image: product.image});
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert(`${product.name} added to cart!`);
-  updateCartCount();
-}
+      <!-- Product grid -->
+      <div class="lg:col-span-2">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Products</h3>
 
-// Buy now
-function buyNow(productId){
-  addToCart(productId);
-  window.location.href = 'cart.html';
-}
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <!-- Products rendered by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
 
-// Update cart counter
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const total = cart.reduce((sum,i) => sum + i.quantity, 0);
-  document.getElementById("cart-count").textContent = total;
-}
+  <!-- Sliding cart drawer (Alpine) -->
+  <div
+    x-show="cartOpen"
+    x-transition:enter="transition transform ease-out duration-300"
+    x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0"
+    x-transition:leave="transition transform ease-in duration-300"
+    x-transition:leave-start="translate-x-0"
+    x-transition:leave-end="translate-x-full"
+    class="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-lg z-50 overflow-y-auto"
+    style="display: none;"
+  >
+    <div class="p-4 border-b flex items-center justify-between">
+      <h2 class="text-xl font-semibold text-gray-700">Your Cart</h2>
+      <div class="flex items-center gap-2">
+        <button @click="cartOpen = false" class="text-gray-500 hover:text-gray-700">Close</button>
+      </div>
+    </div>
 
-updateCartCount();
-</script>
+    <div id="cart-items" class="p-4 space-y-4">
+      <!-- cart items rendered by JS -->
+    </div>
 
+    <div class="p-4 border-t">
+      <div class="flex justify-between items-center mb-4">
+        <div class="text-sm text-gray-600">Subtotal</div>
+        <div id="cart-subtotal" class="text-lg font-bold text-gray-800">$0.00</div>
+      </div>
+
+      <button onclick="checkout()" class="w-full bg-blue-600 text-white py-2 rounded font-medium hover:bg-blue-500">Checkout</button>
+    </div>
+  </div>
+
+  <!-- Overlay for cart (click closes cart) -->
+  <div x-show="cartOpen" @click="cartOpen = false"
+       x-transition.opacity
+       class="fixed inset-0 bg-black/30 z-40"
+       style="display:none;"></div>
+
+  <script>
+    /* ---------- Sample products (IDs, price in cents) ---------- */
+    const PRODUCTS = [
+      {
+        id: 'p1',
+        name: 'Nike Air Max',
+        price: 12500,
+        description: 'Comfortable everyday running shoe.',
+        image: 'https://images.unsplash.com/photo-1578262825743-a4e402caab76?auto=format&fit=crop&w=1200&q=80'
+      },
+      {
+        id: 'p2',
+        name: 'Classic Watch',
+        price: 4500,
+        description: 'Minimalist analog watch.',
+        image: 'https://images.unsplash.com/photo-1532667449560-72a95c8d381b?auto=format&fit=crop&w=1200&q=80'
+      },
+      {
+        id: 'p3',
+        name: 'Leather Satchel',
+        price: 8000,
+        description: 'Durable leather bag for everyday use.',
+        image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1200&q=80'
+      },
+      {
+        id: 'p4',
+        name: 'Sunglasses',
+        price: 2200,
+        description: 'Polarized sunglasses with UV protection.',
+        image: 'https://images.unsplash.com/photo-1590664863685-a99ef05e9f61?auto=format&fit=crop&w=1200&q=80'
+      }
+    ];
+
+    /* ---------- Utility & Cart functions (uses localStorage) ---------- */
+    function centsToUSD(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+
+    function loadProducts() {
+      // render products into grid
+      const grid = document.getElementById('products-grid');
+      grid.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const html = `
+          <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="relative">
+              <img class="product-img" src="${p.image}" alt="${p.name}">
+              <div class="absolute right-3 bottom-[-18px]">
+                <div class="bg-white text-yellow-500 font-extrabold px-3 py-2 rounded-full shadow">${centsToUSD(p.price)}</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <h4 class="text-gray-800 font-semibold">${p.name}</h4>
+              <p class="text-sm text-gray-500 mt-2">${p.description}</p>
+              <div class="mt-4 flex gap-2">
+                <button onclick="buyNow('${p.id}')" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Buy Now</button>
+                <button onclick="addToCart('${p.id}')" class="px-3 py-2 border rounded hover:bg-gray-100">Add</button>
+              </div>
+            </div>
+          </div>
+        `;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        grid.appendChild(wrapper.firstElementChild);
+      });
+
+      // set featured to first product
+      const f = PRODUCTS[0];
+      document.getElementById('featured-image').src = f.image;
+      document.getElementById('featured-name').innerText = f.name;
+      document.getElementById('featured-price').innerText = centsToUSD(f.price);
+      document.getElementById('featured-desc').innerText = f.description;
+    }
+
+    function getCart() {
+      return JSON.parse(localStorage.getItem('cart')) || [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function updateCartCount() {
+      const cart = getCart();
+      const totalQty = cart.reduce((s, i) => s + i.quantity, 0);
+      document.getElementById('cart-count').textContent = totalQty;
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      const container = document.getElementById('cart-items');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 p-2">Your cart is empty.</p>';
+        document.getElementById('cart-subtotal').innerText = '$0.00';
+        updateCartCount();
+        return;
+      }
+
+      let subtotal = 0;
+      cart.forEach(item => {
+        const product = PRODUCTS.find(p => p.id === item.id) || {};
+        subtotal += (product.price || 0) * item.quantity;
+
+        const itemEl = document.createElement('div');
+        itemEl.className = 'flex items-center gap-3';
+        itemEl.innerHTML = `
+          <img src="${product.image}" class="h-16 w-16 rounded object-cover" alt="${product.name}">
+          <div class="flex-1">
+            <div class="font-semibold text-gray-700">${product.name}</div>
+            <div class="text-sm text-gray-500">${centsToUSD(product.price || 0)} &times; ${item.quantity}</div>
+            <div class="mt-2 flex items-center gap-2">
+              <button class="px-2 py-1 border rounded text-sm" onclick="decreaseQty('${item.id}')">-</button>
+              <span class="text-sm">${item.quantity}</span>
+              <button class="px-2 py-1 border rounded text-sm" onclick="increaseQty('${item.id}')">+</button>
+              <button class="ml-4 text-sm text-red-500" onclick="removeFromCart('${item.id}')">Remove</button>
+            </div>
+          </div>
+          <div class="text-gray-700 font-semibold">${centsToUSD((product.price || 0) * item.quantity)}</div>
+        `;
+        container.appendChild(itemEl);
+      });
+
+      document.getElementById('cart-subtotal').innerText = centsToUSD(subtotal);
+      updateCartCount();
+    }
+
+    function addToCart(productId) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return alert('Product not found.');
+
+      let cart = getCart();
+      const found = cart.find(i => i.id === productId);
+      if (found) found.quantity++;
+      else cart.push({ id: productId, quantity: 1 });
+
+      saveCart(cart);
+      renderCart();
+
+      // open cart drawer using Alpine (set attribute)
+      const alpineRoot = document.querySelector('[x-data]');
+      if (alpineRoot && alpineRoot.__x) {
+        // If Alpine is present, set cartOpen to true
+        try { alpineRoot.__x.$data.cartOpen = true; } catch(e) {}
+      }
+
+      alert(`${product.name} added to cart!`);
+    }
+
+    function removeFromCart(productId) {
+      let cart = getCart();
+      cart = cart.filter(i => i.id !== productId);
+      saveCart(cart);
+      renderCart();
+    }
+
+    function increaseQty(productId) {
+      const cart = getCart();
+      const item = cart.find(i => i.id === productId);
+      if (item) { item.quantity++; saveCart(cart); renderCart(); }
+    }
+
+    function decreaseQty(productId) {
+      const cart = getCart();
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+      if (item.quantity > 1) { item.quantity--; saveCart(cart); renderCart(); }
+      else removeFromCart(productId);
+    }
+
+    function buyNow(productId) {
+      addToCart(productId);
+      // Redirect to cart page or checkout (you can change this)
+      // For now we simulate going to /cart.html
+      window.location.href = 'cart.html';
+    }
+
+    function checkout() {
+      // Place your checkout logic here (redirect to checkout, or call payment API)
+      alert('Checkout not implemented in this demo. Build your checkout flow here.');
+    }
+
+    /* ---------- Init ---------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+      renderCart();
+      updateCartCount();
+    });
+  </script>
 </body>
 </html>
