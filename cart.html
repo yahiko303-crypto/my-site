@@ -26,7 +26,7 @@
 
   <div class="mt-6 flex justify-between items-center">
     <div id="cart-total" class="text-lg font-bold text-gray-700">Total: $0.00</div>
-    <a href="checkout.html" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+    <button id="checkout-btn" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</button>
   </div>
 </main>
 
@@ -93,6 +93,27 @@ function removeItem(index){
 
 // Initial render
 renderCartItems();
+
+// ✅ Checkout button with your real endpoint
+document.getElementById("checkout-btn").addEventListener("click", async () => {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if(cart.length === 0){
+    alert("Your cart is empty!");
+    return;
+  }
+  try {
+    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart })
+    });
+    const data = await res.json();
+    if(data.url) window.location.href = data.url;
+  } catch(err){
+    console.error("Checkout error:", err);
+    alert("Failed to start checkout. Try again.");
+  }
+});
 </script>
 
 </body>
