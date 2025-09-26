@@ -9,6 +9,7 @@
 </head>
 <body class="font-sans">
 
+<!-- Header -->
 <header class="bg-white shadow sticky top-0 z-50">
   <div class="container mx-auto flex justify-between items-center px-4 py-4">
     <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
@@ -19,28 +20,29 @@
   </div>
 </header>
 
+<!-- Cart Table -->
 <div class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
-  <div class="overflow-x-auto">
-    <table id="cart-table" class="w-full text-left border-collapse">
+  <div class="bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
+    <table class="w-full text-left">
       <thead>
-        <tr class="border-b">
-          <th class="pb-2">Image</th>
-          <th class="pb-2">Product</th>
-          <th class="pb-2">Price</th>
-          <th class="pb-2">Quantity</th>
-          <th class="pb-2">Subtotal</th>
-          <th class="pb-2">Remove</th>
+        <tr>
+          <th>Item</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>Subtotal</th>
+          <th></th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="cart-table"></tbody>
     </table>
-  </div>
-  <div class="text-right mt-4">
-    <p id="cart-total" class="text-xl font-bold mb-2">Total: $0.00</p>
-    <button id="checkout-btn" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">
-      Checkout
-    </button>
+    <div class="text-right mt-4 font-bold text-lg" id="cart-total">Total: $0.00</div>
+    <div class="mt-6 flex justify-end">
+      <button id="checkout-btn" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">
+        Checkout
+      </button>
+    </div>
   </div>
 </div>
 
@@ -48,11 +50,11 @@
 // Load cart from localStorage
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-function renderCart() {
+function renderCart(){
   const tbody = document.querySelector("#cart-table tbody");
   tbody.innerHTML = "";
-  if (cart.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" class="py-4 text-center">Your cart is empty.</td></tr>';
+  if(cart.length === 0){
+    tbody.innerHTML = '<tr><td colspan="6">Your cart is empty.</td></tr>';
     document.getElementById("cart-total").textContent = "Total: $0.00";
     return;
   }
@@ -61,18 +63,17 @@ function renderCart() {
     const subtotal = item.price * item.quantity;
     total += subtotal;
     const tr = document.createElement("tr");
-    tr.className = "border-b";
     tr.innerHTML = `
-      <td class="py-2"><img src="${item.image}" class="w-16 h-16 object-contain rounded"></td>
-      <td class="py-2">${item.name}</td>
-      <td class="py-2">$${item.price.toFixed(2)}</td>
-      <td class="py-2">
-        <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQty(${idx},-1)">-</button>
+      <td><img src="${item.image}" style="width:40px;height:40px;"></td>
+      <td>${item.name}</td>
+      <td>$${item.price.toFixed(2)}</td>
+      <td>
+        <button class="quantity-btn" onclick="updateQty(${idx},-1)">-</button>
         ${item.quantity}
-        <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQty(${idx},1)">+</button>
+        <button class="quantity-btn" onclick="updateQty(${idx},1)">+</button>
       </td>
-      <td class="py-2">$${subtotal.toFixed(2)}</td>
-      <td class="py-2"><button class="text-red-500" onclick="removeItem(${idx})">X</button></td>
+      <td>$${subtotal.toFixed(2)}</td>
+      <td><span class="remove-btn cursor-pointer text-red-500" onclick="removeItem(${idx})">X</span></td>
     `;
     tbody.appendChild(tr);
   });
@@ -80,28 +81,33 @@ function renderCart() {
   updateCartCount();
 }
 
-function updateQty(idx, change) {
+function updateQty(idx, change){
   cart[idx].quantity += change;
-  if (cart[idx].quantity <= 0) removeItem(idx);
+  if(cart[idx].quantity <= 0) removeItem(idx);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
-function removeItem(idx) {
+function removeItem(idx){
   cart.splice(idx, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCart();
 }
 
-function updateCartCount() {
+function updateCartCount(){
   const total = cart.reduce((sum, i) => sum + i.quantity, 0);
   const c = document.getElementById("cart-count");
-  if (c) c.textContent = total;
+  if(c) c.textContent = total;
 }
 
-// Checkout button using your real endpoint
+renderCart();
+
+// ✅ Checkout button with your real endpoint
 document.getElementById("checkout-btn").addEventListener("click", async () => {
-  if (cart.length === 0) { alert("Your cart is empty!"); return; }
+  if(cart.length === 0){
+    alert("Your cart is empty!");
+    return;
+  }
   try {
     const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
       method: "POST",
@@ -109,15 +115,12 @@ document.getElementById("checkout-btn").addEventListener("click", async () => {
       body: JSON.stringify({ items: cart })
     });
     const data = await res.json();
-    if (data.url) window.location.href = data.url;
-  } catch(err) {
+    if(data.url) window.location.href = data.url;
+  } catch(err){
     console.error("Checkout error:", err);
     alert("Failed to start checkout. Try again.");
   }
 });
-
-// Initial render
-renderCart();
 </script>
 
 </body>
