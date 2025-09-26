@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Cart — DjsDopeDesigns</title>
+<title>Your Cart</title>
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-sans">
 
-<!-- Header -->
 <header class="bg-white shadow sticky top-0 z-50">
   <div class="container mx-auto flex justify-between items-center px-4 py-4">
     <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
@@ -20,79 +19,105 @@
   </div>
 </header>
 
-<main class="container mx-auto px-4 py-6">
-  <h1 class="text-2xl font-bold mb-4 text-gray-700">Your Cart</h1>
-  <div id="cart-items" class="space-y-4"></div>
-
-  <div class="mt-6 flex justify-between items-center">
-    <div id="cart-total" class="text-lg font-bold text-gray-700">Total: $0.00</div>
-    <a href="checkout.html" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
+  <div class="overflow-x-auto">
+    <table id="cart-table" class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b">
+          <th class="pb-2">Image</th>
+          <th class="pb-2">Product</th>
+          <th class="pb-2">Price</th>
+          <th class="pb-2">Quantity</th>
+          <th class="pb-2">Subtotal</th>
+          <th class="pb-2">Remove</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-</main>
+  <div class="text-right mt-4">
+    <p id="cart-total" class="text-xl font-bold mb-2">Total: $0.00</p>
+    <button id="checkout-btn" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">
+      Checkout
+    </button>
+  </div>
+</div>
 
 <script>
 // Load cart from localStorage
-function renderCartItems() {
-  const container = document.getElementById("cart-items");
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  container.innerHTML = '';
-  let total = 0;
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  cart.forEach((item, index) => {
-    const itemTotal = (item.price * item.quantity).toFixed(2);
-    total += parseFloat(itemTotal);
-
-    const div = document.createElement('div');
-    div.className = "flex items-center justify-between bg-white p-4 rounded shadow";
-    div.innerHTML = `
-      <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
-      <div class="ml-4 flex-1">
-        <div class="font-medium text-gray-700">${item.name}</div>
-        <div class="text-sm text-gray-500 flex items-center space-x-2 mt-1">
-          <button class="px-2 bg-gray-200 rounded" onclick="decreaseQuantity(${index})">−</button>
-          <span>${item.quantity}</span>
-          <button class="px-2 bg-gray-200 rounded" onclick="increaseQuantity(${index})">+</button>
-        </div>
-      </div>
-      <div class="font-bold text-gray-700">$${itemTotal}</div>
-      <button class="ml-2 text-red-500" onclick="removeItem(${index})">✕</button>
-    `;
-    container.appendChild(div);
-  });
-
-  document.getElementById("cart-total").textContent = `Total: $${total.toFixed(2)}`;
-  document.getElementById("cart-count").textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-// Cart manipulation functions
-function increaseQuantity(index){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart[index].quantity++;
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCartItems();
-}
-
-function decreaseQuantity(index){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if(cart[index].quantity > 1){
-    cart[index].quantity--;
-  } else {
-    cart.splice(index,1);
+function renderCart() {
+  const tbody = document.querySelector("#cart-table tbody");
+  tbody.innerHTML = "";
+  if (cart.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="py-4 text-center">Your cart is empty.</td></tr>';
+    document.getElementById("cart-total").textContent = "Total: $0.00";
+    return;
   }
-  localStorage.setItem("cart", JSON.stringify(cart));
-  renderCartItems();
+  let total = 0;
+  cart.forEach((item, idx) => {
+    const subtotal = item.price * item.quantity;
+    total += subtotal;
+    const tr = document.createElement("tr");
+    tr.className = "border-b";
+    tr.innerHTML = `
+      <td class="py-2"><img src="${item.image}" class="w-16 h-16 object-contain rounded"></td>
+      <td class="py-2">${item.name}</td>
+      <td class="py-2">$${item.price.toFixed(2)}</td>
+      <td class="py-2">
+        <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQty(${idx},-1)">-</button>
+        ${item.quantity}
+        <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQty(${idx},1)">+</button>
+      </td>
+      <td class="py-2">$${subtotal.toFixed(2)}</td>
+      <td class="py-2"><button class="text-red-500" onclick="removeItem(${idx})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("cart-total").textContent = "Total: $" + total.toFixed(2);
+  updateCartCount();
 }
 
-function removeItem(index){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.splice(index,1);
+function updateQty(idx, change) {
+  cart[idx].quantity += change;
+  if (cart[idx].quantity <= 0) removeItem(idx);
   localStorage.setItem("cart", JSON.stringify(cart));
-  renderCartItems();
+  renderCart();
 }
+
+function removeItem(idx) {
+  cart.splice(idx, 1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
+
+function updateCartCount() {
+  const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+  const c = document.getElementById("cart-count");
+  if (c) c.textContent = total;
+}
+
+// Checkout button using your real endpoint
+document.getElementById("checkout-btn").addEventListener("click", async () => {
+  if (cart.length === 0) { alert("Your cart is empty!"); return; }
+  try {
+    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  } catch(err) {
+    console.error("Checkout error:", err);
+    alert("Failed to start checkout. Try again.");
+  }
+});
 
 // Initial render
-renderCartItems();
+renderCart();
 </script>
 
 </body>
