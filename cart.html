@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Cart</title>
+<title>Your Cart — DjsDopeDesigns</title>
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -20,107 +20,79 @@
   </div>
 </header>
 
-<!-- Cart Table -->
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
-    <table class="w-full text-left">
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Qty</th>
-          <th>Subtotal</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="cart-table"></tbody>
-    </table>
-    <div class="text-right mt-4 font-bold text-lg" id="cart-total">Total: $0.00</div>
-    <div class="mt-6 flex justify-end">
-      <button id="checkout-btn" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">
-        Checkout
-      </button>
-    </div>
+<main class="container mx-auto px-4 py-6">
+  <h1 class="text-2xl font-bold mb-4 text-gray-700">Your Cart</h1>
+  <div id="cart-items" class="space-y-4"></div>
+
+  <div class="mt-6 flex justify-between items-center">
+    <div id="cart-total" class="text-lg font-bold text-gray-700">Total: $0.00</div>
+    <a href="checkout.html" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
   </div>
-</div>
+</main>
 
 <script>
 // Load cart from localStorage
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-function renderCart(){
-  const tbody = document.querySelector("#cart-table tbody");
-  tbody.innerHTML = "";
-  if(cart.length === 0){
-    tbody.innerHTML = '<tr><td colspan="6">Your cart is empty.</td></tr>';
-    document.getElementById("cart-total").textContent = "Total: $0.00";
-    return;
-  }
+function renderCartItems() {
+  const container = document.getElementById("cart-items");
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  container.innerHTML = '';
   let total = 0;
-  cart.forEach((item, idx) => {
-    const subtotal = item.price * item.quantity;
-    total += subtotal;
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><img src="${item.image}" style="width:40px;height:40px;"></td>
-      <td>${item.name}</td>
-      <td>$${item.price.toFixed(2)}</td>
-      <td>
-        <button class="quantity-btn" onclick="updateQty(${idx},-1)">-</button>
-        ${item.quantity}
-        <button class="quantity-btn" onclick="updateQty(${idx},1)">+</button>
-      </td>
-      <td>$${subtotal.toFixed(2)}</td>
-      <td><span class="remove-btn cursor-pointer text-red-500" onclick="removeItem(${idx})">X</span></td>
+
+  cart.forEach((item, index) => {
+    const itemTotal = (item.price * item.quantity).toFixed(2);
+    total += parseFloat(itemTotal);
+
+    const div = document.createElement('div');
+    div.className = "flex items-center justify-between bg-white p-4 rounded shadow";
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
+      <div class="ml-4 flex-1">
+        <div class="font-medium text-gray-700">${item.name}</div>
+        <div class="text-sm text-gray-500 flex items-center space-x-2 mt-1">
+          <button class="px-2 bg-gray-200 rounded" onclick="decreaseQuantity(${index})">−</button>
+          <span>${item.quantity}</span>
+          <button class="px-2 bg-gray-200 rounded" onclick="increaseQuantity(${index})">+</button>
+        </div>
+      </div>
+      <div class="font-bold text-gray-700">$${itemTotal}</div>
+      <button class="ml-2 text-red-500" onclick="removeItem(${index})">✕</button>
     `;
-    tbody.appendChild(tr);
+    container.appendChild(div);
   });
-  document.getElementById("cart-total").textContent = "Total: $" + total.toFixed(2);
-  updateCartCount();
-}
 
-function updateQty(idx, change){
-  cart[idx].quantity += change;
-  if(cart[idx].quantity <= 0) removeItem(idx);
+  document.getElementById("cart-total").textContent = `Total: $${total.toFixed(2)}`;
+  document.getElementById("cart-count").textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
   localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
 }
 
-function removeItem(idx){
-  cart.splice(idx, 1);
+// Cart manipulation functions
+function increaseQuantity(index){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart[index].quantity++;
   localStorage.setItem("cart", JSON.stringify(cart));
-  renderCart();
+  renderCartItems();
 }
 
-function updateCartCount(){
-  const total = cart.reduce((sum, i) => sum + i.quantity, 0);
-  const c = document.getElementById("cart-count");
-  if(c) c.textContent = total;
+function decreaseQuantity(index){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if(cart[index].quantity > 1){
+    cart[index].quantity--;
+  } else {
+    cart.splice(index,1);
+  }
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCartItems();
 }
 
-renderCart();
+function removeItem(index){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.splice(index,1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCartItems();
+}
 
-// ✅ Checkout button with your real endpoint
-document.getElementById("checkout-btn").addEventListener("click", async () => {
-  if(cart.length === 0){
-    alert("Your cart is empty!");
-    return;
-  }
-  try {
-    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart })
-    });
-    const data = await res.json();
-    if(data.url) window.location.href = data.url;
-  } catch(err){
-    console.error("Checkout error:", err);
-    alert("Failed to start checkout. Try again.");
-  }
-});
+// Initial render
+renderCartItems();
 </script>
 
 </body>
