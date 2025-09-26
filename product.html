@@ -4,15 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Page</title>
+<link href="your-site-styles.css" rel="stylesheet"> <!-- Your CSS with Tailwind + Alpine additions -->
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-sans">
 
 <!-- Header -->
-<header class="bg-white shadow sticky top-0 z-50">
-  <div class="container mx-auto flex justify-between items-center px-4 py-4">
-    <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
+<header class="header">
+  <div class="header-container">
+    <a href="index.html" class="logo">DjsDopeDesigns</a>
     <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
       🛒
       <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
@@ -21,22 +22,22 @@
 </header>
 
 <!-- Search Bar -->
-<div class="container mx-auto px-4 py-4">
+<div class="container my-4">
   <input 
     type="text" 
     id="searchInput" 
     placeholder="Search products..." 
-    class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    class="search-bar"
     oninput="filterProducts()"
   >
 </div>
 
 <!-- Featured Product -->
-<div class="container mx-auto px-4 my-4" id="featured-product"></div>
+<div class="container my-4" id="featured-product"></div>
 
 <!-- Other Products -->
-<div class="container mx-auto px-4 mt-8">
-  <div id="other-products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+<div class="container mt-8">
+  <div id="other-products" class="cards"></div>
 </div>
 
 <!-- Sliding Cart -->
@@ -44,9 +45,7 @@
      class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-white border-l-2 border-gray-300 overflow-y-auto z-50">
   <div class="flex justify-between items-center">
     <h3 class="text-2xl font-medium text-gray-700">Your cart</h3>
-    <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">
-      ✕
-    </button>
+    <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">✕</button>
   </div>
   <hr class="my-3">
   <div id="cart-items" class="space-y-6"></div>
@@ -96,14 +95,12 @@ function renderOtherProducts(filteredProducts) {
   const otherContainer = document.getElementById("other-products");
   otherContainer.innerHTML = '';
   filteredProducts.forEach(p => {
-    if(p.id === featuredId) return; // skip featured
+    if(p.id === featuredId) return;
     const div = document.createElement('div');
-    div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center";
+    div.className = "card";
     div.innerHTML = `
-      <div class="w-full aspect-w-1 aspect-h-1 mb-2">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
-      </div>
-      <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
+      <img src="${p.image}" alt="${p.name}">
+      <div class="text-sm font-medium text-gray-700 mt-2">${p.name}</div>
       <div class="text-sm text-gray-500 mb-2">$${(p.price/100).toFixed(2)}</div>
       <div class="flex space-x-2">
         <a href="?id=${p.id}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
@@ -117,9 +114,7 @@ function renderOtherProducts(filteredProducts) {
 // Filter products by search
 function filterProducts() {
   const query = document.getElementById("searchInput").value.toLowerCase();
-  const filtered = products.filter(p => 
-    p.name.toLowerCase().startsWith(query)
-  );
+  const filtered = products.filter(p => p.name.toLowerCase().startsWith(query));
   renderOtherProducts(filtered);
 }
 
