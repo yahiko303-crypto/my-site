@@ -1,202 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DjsDopeDesigns - Products</title>
-<style>
-  body { 
-    font-family: "Helvetica Neue", Arial, sans-serif; 
-    margin: 0; 
-    background: #fafafa; 
-    color: #333;
-  }
-
-  /* 🔝 Sticky Header */
-  .header { 
-    position: sticky; 
-    top: 0; 
-    background: #fff; 
-    padding: 12px 20px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
-    z-index: 1000;
-  }
-  .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
-  .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
-  #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
-
-  /* 🔍 Search bar */
-  #search-bar {
-    display: block;
-    margin: 20px auto;
-    width: 90%;
-    max-width: 400px;
-    padding: 10px 15px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-  }
-
-  /* 🛍 Product Grid */
-  .products {
-    display: grid;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  }
-
-  /* 🟣 Card Style */
-  .card {
-    --card-bg: #ffffff;
-    --card-accent: #7c3aed;
-    --card-text: #1e293b;
-    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-
-    background: var(--card-bg);
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--card-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .card__shine { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%); opacity: 0; transition: opacity 0.3s ease; }
-  .card__glow { position: absolute; inset: -10px; background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.3) 0%, rgba(124,58,237,0) 70%); opacity: 0; transition: opacity 0.5s ease; }
-
-  .card__content { padding: 1.25em; display: flex; flex-direction: column; gap: 0.75em; position: relative; z-index: 2; flex: 1 1 auto; }
-
-  .card__image { width: 100%; flex-shrink: 0; border-radius: 12px; overflow: hidden; max-height: 140px; }
-  .card__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-  .card__text { display: flex; flex-direction: column; gap: 0.25em; }
-  .card__title { color: var(--card-text); font-size: 1.1em; margin: 0; font-weight: 700; transition: all 0.3s ease; }
-  .card__description { color: var(--card-text); font-size: 0.75em; margin: 0; opacity: 0.7; transition: all 0.3s ease; }
-
-  .card__footer { display: flex; justify-content: center; align-items: center; margin-top: auto; }
-
-  button {
-    --button_radius: 0.75em;
-    --button_color: #e8e8e8;
-    --button_outline_color: #000000;
-    font-size: 17px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    border-radius: var(--button_radius);
-    background: var(--button_outline_color);
-    width: 100%;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-  }
-
-  .button_top { display: block; width: 100%; text-align: center; color: white; transform: scale(0.9); transition: all 0.3s ease; }
-  button:hover .button_top { transform: scale(1); }
-  button:active .button_top { transform: scale(0.95); }
-
-  .card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border-color: rgba(124,58,237,0.2); }
-  .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
-  .card:hover .card__glow { opacity: 1; }
-
-  @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
-
-  @media (max-width: 768px) {
-    .products { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  @media (min-width: 769px) {
-    .products { grid-template-columns: repeat(4, 1fr); max-width: 1200px; margin: 0 auto; gap: 20px; }
-    .card__image { max-height: none; flex-grow: 1; }
-  }
-</style>
+<title>Product Page</title>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="font-sans">
 
-<header class="header">
-  <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
+<!-- Header -->
+<header class="bg-white shadow sticky top-0 z-50">
+  <div class="container mx-auto flex justify-between items-center px-4 py-4">
+    <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
+    <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
+      🛒
+      <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
+    </button>
+  </div>
 </header>
 
-<input type="text" id="search-bar" placeholder="Search products..." />
+<!-- Search Bar -->
+<div class="container mx-auto px-4 py-4">
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Search products..." 
+    class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    oninput="filterProducts()"
+  >
+</div>
 
-<section class="products" id="product-grid"></section>
+<!-- Featured Product -->
+<div class="container mx-auto px-4 my-4" id="featured-product"></div>
+
+<!-- Other Products -->
+<div class="container mx-auto px-4 mt-8">
+  <div id="other-products" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+</div>
+
+<!-- Sliding Cart -->
+<div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" 
+     class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-white border-l-2 border-gray-300 overflow-y-auto z-50">
+  <div class="flex justify-between items-center">
+    <h3 class="text-2xl font-medium text-gray-700">Your cart</h3>
+    <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">
+      ✕
+    </button>
+  </div>
+  <hr class="my-3">
+  <div id="cart-items" class="space-y-6"></div>
+  <div class="mt-8 flex justify-center">
+    <a href="cart.html" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+  </div>
+</div>
 
 <script>
-let allProducts = [];
+// Product data (prices in cents)
+let products = [
+  {"id":"1","name":"Drake Dancing","price":50,"image":"images/1drake-dancing.gif","description":"Drake doing the hotline."},
+  {"id":"2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","description":"Hammer Girl in action."},
+  {"id":"3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","description":"Funny dancing guy."},
+  {"id":"4","name":"Green Dancer","price":350,"image":"images/4green-dancer.gif","description":"Green dancer animation."},
+  {"id":"5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","description":"Death Drummer rocking."}
+];
 
-// Load products from your JSON
-fetch('products.json')
-  .then(res => res.json())
-  .then(products => {
-    allProducts = products;
-    renderProducts(allProducts);
-  });
+// Get featured product id from URL
+const params = new URLSearchParams(window.location.search);
+const featuredId = params.get('id') || "1";
 
-function renderProducts(products) {
-  const grid = document.getElementById('product-grid');
-  grid.innerHTML = '';
-  products.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-  <a href="product.html?id=${p.id}" style="text-decoration:none; color:inherit;">
-    <div class="card__shine"></div>
-    <div class="card__glow"></div>
-    <div class="card__content">
-      <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
-      <div class="card__text">
-        <h3 class="card__title">${p.name}</h3>
-        <p class="card__description">$${(p.price/100).toFixed(2)}</p>
+// Render featured product
+function renderFeatured() {
+  const featured = products.find(p => p.id === featuredId);
+  const container = document.getElementById("featured-product");
+  container.innerHTML = `
+    <div class="bg-white p-4 rounded-lg shadow-md md:flex md:items-center">
+      <div class="w-full md:w-1/2">
+        <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
       </div>
-      <div class="card__footer">
-        <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
+      <div class="mt-4 md:mt-0 md:ml-6 md:w-1/2">
+        <h2 class="text-xl font-bold text-gray-700">${featured.name}</h2>
+        <p class="text-gray-500 my-2">$${(featured.price/100).toFixed(2)}</p>
+        <p class="text-gray-600 mb-4">${featured.description}</p>
+        <div class="flex space-x-2">
+          <button onclick="buyNow('${featured.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Order Now</button>
+          <button onclick="addToCart('${featured.id}')" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">🛒</button>
+        </div>
       </div>
     </div>
-  </a>
-`;
-    grid.appendChild(card);
+  `;
+}
+
+// Render other products
+function renderOtherProducts(filteredProducts) {
+  const otherContainer = document.getElementById("other-products");
+  otherContainer.innerHTML = '';
+  filteredProducts.forEach(p => {
+    if(p.id === featuredId) return; // skip featured
+    const div = document.createElement('div');
+    div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center";
+    div.innerHTML = `
+      <div class="w-full aspect-w-1 aspect-h-1 mb-2">
+        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
+      </div>
+      <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
+      <div class="text-sm text-gray-500 mb-2">$${(p.price/100).toFixed(2)}</div>
+      <div class="flex space-x-2">
+        <a href="?id=${p.id}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
+        <button onclick="addToCart('${p.id}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
+      </div>
+    `;
+    otherContainer.appendChild(div);
   });
 }
 
-// 🔄 Add search functionality
-document.getElementById('search-bar').addEventListener('input', function() {
-  const query = this.value.trim().toLowerCase();
-  if(query === '') renderProducts(allProducts);
-  else {
-    const filtered = allProducts.filter(p => p.name.toLowerCase().startsWith(query));
-    renderProducts(filtered);
-  }
-});
+// Filter products by search
+function filterProducts() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = products.filter(p => 
+    p.name.toLowerCase().startsWith(query)
+  );
+  renderOtherProducts(filtered);
+}
 
-// 🔄 Cart functionality
-function addToCart(productId){
-  const product = allProducts.find(p=>p.id===productId);
-  if(!product) return;
+// Cart functions
+function addToCart(id){
+  const product = products.find(p => p.id === id);
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const existing = cart.find(i=>i.id===productId);
+  const existing = cart.find(i => i.id === id);
   if(existing) existing.quantity++;
-  else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
+  else cart.push({id: product.id, name: product.name, price: product.price/100, quantity:1, image: product.image});
   localStorage.setItem("cart", JSON.stringify(cart));
-  alert(`${product.name} added to cart!`);
   updateCartCount();
+  renderCartItems();
+}
+
+function buyNow(id){
+  addToCart(id);
+  window.location.href = 'cart.html';
 }
 
 function updateCartCount(){
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
+  const total = cart.reduce((sum,i) => sum + i.quantity, 0);
   document.getElementById("cart-count").textContent = total;
 }
+
+function renderCartItems() {
+  const container = document.getElementById("cart-items");
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  container.innerHTML = '';
+  cart.forEach(item => {
+    const div = document.createElement('div');
+    div.className = "flex items-center justify-between";
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
+      <div class="ml-2 flex-1">${item.name} x ${item.quantity}</div>
+      <div>$${(item.price * item.quantity).toFixed(2)}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Initial render
+renderFeatured();
+renderOtherProducts(products.filter(p => p.id !== featuredId));
 updateCartCount();
+renderCartItems();
 </script>
+
 </body>
 </html>
