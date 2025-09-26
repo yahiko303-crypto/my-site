@@ -52,27 +52,32 @@
   <hr class="my-3">
   <div id="cart-items" class="space-y-6"></div>
   <div class="mt-8 flex justify-center">
-    <a href="cart.html" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+    <button id="checkout-btn" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</button>
   </div>
 </div>
 
 <script>
-// Product data (prices in cents)
-let products = [
-  {"id":"1","name":"Drake Dancing","price":50,"image":"images/1drake-dancing.gif","description":"Drake doing the hotline."},
-  {"id":"2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","description":"Hammer Girl in action."},
-  {"id":"3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","description":"Funny dancing guy."},
-  {"id":"4","name":"Green Dancer","price":350,"image":"images/4green-dancer.gif","description":"Green dancer animation."},
-  {"id":"5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","description":"Death Drummer rocking."}
-];
-
-// Get featured product id from URL
+// Load products from products.json
+let products = [];
 const params = new URLSearchParams(window.location.search);
-const featuredId = params.get('id') || "1";
+const featuredId = params.get('id') || null;
+
+async function loadProducts() {
+  try {
+    const res = await fetch('products.json');
+    products = await res.json();
+    renderFeatured();
+    renderOtherProducts(products.filter(p => p.id !== featuredId));
+  } catch(err) {
+    console.error("Failed to load products:", err);
+  }
+}
 
 // Render featured product
 function renderFeatured() {
+  if(!featuredId) return;
   const featured = products.find(p => p.id === featuredId);
+  if(!featured) return;
   const container = document.getElementById("featured-product");
   container.innerHTML = `
     <div class="bg-white p-4 rounded-lg shadow-md md:flex md:items-center max-w-4xl w-full">
@@ -99,7 +104,6 @@ function renderOtherProducts(filteredProducts) {
   const otherContainer = document.getElementById("other-products");
   otherContainer.innerHTML = '';
   filteredProducts.forEach(p => {
-    if(p.id === featuredId) return; // skip featured
     const div = document.createElement('div');
     div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center justify-between";
     div.innerHTML = `
@@ -163,11 +167,31 @@ function renderCartItems() {
   });
 }
 
+// ✅ Checkout button
+document.getElementById("checkout-btn").addEventListener("click", async () => {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  if(cart.length === 0){
+    alert("Your cart is empty!");
+    return;
+  }
+  try {
+    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart })
+    });
+    const data = await res.json();
+    if(data.url) window.location.href = data.url;
+  } catch(err){
+    console.error("Checkout error:", err);
+    alert("Failed to start checkout. Try again.");
+  }
+});
+
 // Initial render
-renderFeatured();
-renderOtherProducts(products.filter(p => p.id !== featuredId));
-updateCartCount();
 renderCartItems();
+loadProducts();
+updateCartCount();
 </script>
 
 </body>
