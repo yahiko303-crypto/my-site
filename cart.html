@@ -1,210 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cart</title>
-<style>
-/* 🔹 Mobile-first base styles */
-body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  margin: 0;
-  background: #fafafa;
-  color: #333;
-}
-
-.header {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  padding: 12px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  z-index: 1000;
-}
-
-.logo {
-  font-weight: bold;
-  font-size: 1rem; /* smaller for mobile */
-  text-decoration: none;
-  color: #222;
-}
-
-.cart {
-  position: relative;
-  font-size: 1.2rem;
-  text-decoration: none;
-  color: #444;
-}
-
-#cart-count {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  background: #f1641e;
-  color: #fff;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-.container {
-  padding: 10px;
-  max-width: 100%; /* fit mobile screen */
-  overflow-x: hidden;
-}
-
-h1 {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 12px;
-}
-
-th, td {
-  padding: 6px;
-  border-bottom: 1px solid #ddd;
-  text-align: center;
-  word-break: break-word; /* prevent horizontal scroll */
-}
-
-.quantity-btn {
-  padding: 2px 6px;
-  background: #f1641e;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 10px;
-}
-
-.remove-btn {
-  cursor: pointer;
-  color: #f1641e;
-  font-weight: bold;
-  font-size: 12px;
-}
-
-.total {
-  text-align: right;
-  font-weight: bold;
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-.checkout-btn {
-  background-color: #6772e5;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 15px;
-  display: block;
-  margin-left: auto;
-}
-
-/* 🔹 Product images base size */
-#cart-table img {
-  width: 40px;
-  height: 40px;
-}
-
-/* 🔹 Desktop enhancements */
-@media (min-width: 768px){
-  .logo { font-size: 1.2rem; }
-  .cart { font-size: 1.4rem; }
-  table { font-size: 14px; }
-  .quantity-btn { font-size: 12px; padding: 4px 8px; }
-  .checkout-btn { font-size: 16px; padding: 10px 20px; }
-  .container { max-width: 800px; margin: auto; }
-
-  /* make images larger on desktop */
-  #cart-table img {
-    width: 80px;
-    height: 80px;
-  }
-}
-</style>
+<title>Your Cart — DjsDopeDesigns</title>
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<header class="header">
-  <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
+<body class="font-sans">
+
+<!-- Header -->
+<header class="bg-white shadow sticky top-0 z-50">
+  <div class="container mx-auto flex justify-between items-center px-4 py-4">
+    <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
+    <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
+      🛒
+      <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
+    </button>
+  </div>
 </header>
 
-<div class="container">
-  <h1>Your Cart</h1>
-  <table id="cart-table">
-    <thead>
-      <tr><th>Product</th><th>Name</th><th>Price</th><th>Qty</th><th>Subtotal</th><th>Remove</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div class="total" id="cart-total"></div>
-  <button id="checkout-btn" class="checkout-btn">Checkout</button>
-</div>
+<!-- Cart Content -->
+<main class="container mx-auto px-4 py-6">
+  <h1 class="text-2xl font-bold mb-4 text-gray-700">Your Cart</h1>
+  <div id="cart-items" class="space-y-4">
+    <!-- Items will populate here -->
+  </div>
+
+  <div class="mt-6 flex justify-between items-center">
+    <div id="cart-total" class="text-lg font-bold text-gray-700">Total: $0.00</div>
+    <a href="checkout.html" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</a>
+  </div>
+</main>
 
 <script>
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+// Populate cart from localStorage
+function renderCartItems() {
+  const container = document.getElementById("cart-items");
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  container.innerHTML = '';
 
-function renderCart(){
-  const tbody=document.querySelector("#cart-table tbody");
-  tbody.innerHTML="";
-  if(cart.length===0){
-    tbody.innerHTML='<tr><td colspan="6">Your cart is empty.</td></tr>';
-    document.getElementById("cart-total").textContent="Total: $0.00";
-    return;
-  }
-  let total=0;
-  cart.forEach((item,idx)=>{
-    const subtotal = item.price*item.quantity; total+=subtotal;
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td><img src="${item.image}" style="width:40px;height:40px;"></td>
-                  <td>${item.name}</td>
-                  <td>$${item.price.toFixed(2)}</td>
-                  <td>
-                    <button class="quantity-btn" onclick="updateQty(${idx},-1)">-</button>${item.quantity}
-                    <button class="quantity-btn" onclick="updateQty(${idx},1)">+</button>
-                  </td>
-                  <td>$${subtotal.toFixed(2)}</td>
-                  <td><span class="remove-btn" onclick="removeItem(${idx})">X</span></td>`;
-    tbody.appendChild(tr);
+  let total = 0;
+
+  cart.forEach(item => {
+    const itemTotal = (item.price * item.quantity).toFixed(2);
+    total += parseFloat(itemTotal);
+
+    const div = document.createElement('div');
+    div.className = "flex items-center justify-between bg-white p-4 rounded shadow";
+    div.innerHTML = `
+      <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded">
+      <div class="ml-4 flex-1">
+        <div class="font-medium text-gray-700">${item.name}</div>
+        <div class="text-sm text-gray-500">Quantity: ${item.quantity}</div>
+      </div>
+      <div class="font-bold text-gray-700">$${itemTotal}</div>
+    `;
+    container.appendChild(div);
   });
-  document.getElementById("cart-total").textContent="Total: $"+total.toFixed(2);
-  updateCartCount();
+
+  document.getElementById("cart-total").textContent = `Total: $${total.toFixed(2)}`;
+  document.getElementById("cart-count").textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
 }
 
-function updateQty(idx,change){ cart[idx].quantity+=change; if(cart[idx].quantity<=0) removeItem(idx); localStorage.setItem("cart",JSON.stringify(cart)); renderCart(); }
-function removeItem(idx){ cart.splice(idx,1); localStorage.setItem("cart",JSON.stringify(cart)); renderCart(); }
-function updateCartCount(){ const total=cart.reduce((sum,i)=>sum+i.quantity,0); const c=document.getElementById("cart-count"); if(c)c.textContent=total; }
-
-renderCart();
-
-document.getElementById("checkout-btn").addEventListener("click", async () => {
-  if(cart.length===0){ alert("Your cart is empty!"); return; }
-  try {
-    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart })
-    });
-    const data = await res.json();
-    if(data.url) window.location.href = data.url;
-  } catch(err) {
-    console.error("Checkout error:", err);
-    alert("Failed to start checkout. Try again.");
-  }
-});
+// Call on page load
+renderCartItems();
 </script>
+
 </body>
 </html>
