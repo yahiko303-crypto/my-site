@@ -8,7 +8,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="style.css"> <!-- your custom CSS -->
 </head>
-<body class="font-sans bg-gradient-to-r from-green-200 to-blue-200">
+<body class="font-sans bg-gradient-to-r from-green-200 to-blue-200 min-h-screen">
 
 <!-- Header -->
 <header class="bg-white shadow sticky top-0 z-50">
@@ -80,7 +80,7 @@ function renderFeatured() {
   if(!featured) return;
   const container = document.getElementById("featured-product");
   container.innerHTML = `
-    <div class="bg-white p-4 rounded-lg shadow-md md:flex md:items-center max-w-4xl w-full">
+    <div class="bg-white/80 p-4 rounded-lg shadow-md md:flex md:items-center max-w-4xl w-full">
       <div class="w-full md:w-1/2">
         <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
       </div>
@@ -105,7 +105,7 @@ function renderOtherProducts(filteredProducts) {
   otherContainer.innerHTML = '';
   filteredProducts.forEach(p => {
     const div = document.createElement('div');
-    div.className = "bg-white p-4 rounded-lg shadow-md flex flex-col items-center justify-between";
+    div.className = "bg-white/80 p-4 rounded-lg shadow-md flex flex-col items-center justify-between";
     div.innerHTML = `
       <div class="w-full aspect-w-1 aspect-h-1 mb-2">
         <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
