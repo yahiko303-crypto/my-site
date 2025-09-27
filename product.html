@@ -10,10 +10,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ====== FOOTER HEIGHT ====== */
-    footer {
-      height: 160px; /* Adjust this if your sticky buttons change size */
-    }
+    footer { height: 160px; }
   </style>
 </head>
 
@@ -70,54 +67,50 @@
 
   <!-- ====== SCRIPT SECTION ====== -->
   <script>
-    // ====== GLOBAL VARIABLES ======
     let products = [];
     const params = new URLSearchParams(window.location.search);
-    const featuredId = params.get('id') || null;
+    const featuredSlug = params.get('slug') || null;
 
-    // ====== LOAD PRODUCTS ======
     async function loadProducts() {
       try {
         const res = await fetch('products.json');
         products = await res.json();
         renderFeatured();
-        renderOtherProducts(products.filter(p => p.id !== featuredId));
+        renderOtherProducts(products.filter(p => p.slug !== featuredSlug));
       } catch(err) {
         console.error("Failed to load products:", err);
       }
     }
 
-    // ====== RENDER FEATURED PRODUCT ======
     function renderFeatured() {
-      if(!featuredId) return;
-      const featured = products.find(p => p.id === featuredId);
+      if(!featuredSlug) return;
+      const featured = products.find(p => p.slug === featuredSlug);
       if(!featured) return;
+
+      // 🔑 Set SEO page title
+      document.title = `${featured.slug.replace(/-/g, " ")} | DjsDopeDesigns`;
 
       const container = document.getElementById("featured-product");
       container.innerHTML = `
         <div class="bg-white/80 rounded-lg shadow-md max-w-6xl w-full flex flex-col md:flex-row md:space-x-6 p-4">
-          <!-- IMAGE -->
           <div class="md:w-1/2 w-full">
             <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
           </div>
-          <!-- INFO -->
           <div class="md:w-1/2 w-full mt-4 md:mt-0 flex flex-col justify-between relative">
             <div>
               <h1 class="text-3xl font-bold text-gray-800 mb-2">${featured.name}</h1>
               <p class="text-gray-500 text-xl mb-4">$${(featured.price/100).toFixed(2)}</p>
               <p class="text-gray-700 mb-6">${featured.description}</p>
             </div>
-            <!-- STICKY MOBILE BUTTONS -->
             <div class="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 fixed bottom-0 left-0 right-0 md:static md:mt-4 bg-white md:bg-transparent p-4 md:p-0 shadow md:shadow-none">
-              <button onclick="buyNow('${featured.id}')" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded hover:bg-indigo-500 text-lg font-semibold">Order Now</button>
-              <button onclick="addToCart('${featured.id}')" class="flex-1 bg-gray-200 px-4 py-3 rounded hover:bg-gray-300 text-lg font-semibold">🛒 Add to Cart</button>
+              <button onclick="buyNow('${featured.slug}')" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded hover:bg-indigo-500 text-lg font-semibold">Order Now</button>
+              <button onclick="addToCart('${featured.slug}')" class="flex-1 bg-gray-200 px-4 py-3 rounded hover:bg-gray-300 text-lg font-semibold">🛒 Add to Cart</button>
             </div>
           </div>
         </div>
       `;
     }
 
-    // ====== RENDER OTHER PRODUCTS ======
     function renderOtherProducts(filteredProducts) {
       const otherContainer = document.getElementById("other-products");
       otherContainer.innerHTML = '';
@@ -131,15 +124,14 @@
           <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
           <div class="text-sm text-gray-500 mb-2">$${(p.price/100).toFixed(2)}</div>
           <div class="flex space-x-2">
-            <a href="?id=${p.id}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
-            <button onclick="addToCart('${p.id}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
+            <a href="?slug=${p.slug}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
+            <button onclick="addToCart('${p.slug}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
           </div>
         `;
         otherContainer.appendChild(div);
       });
     }
 
-    // ====== SEARCH FILTER FUNCTIONS ======
     function filterProducts() {
       const query = document.getElementById("searchInput").value.toLowerCase();
       const preview = document.getElementById("searchPreview");
@@ -152,7 +144,7 @@
         preview.innerHTML = `<div class="p-2 text-gray-500">No results</div>`;
       } else {
         preview.innerHTML = filtered.map(p => `
-          <a href="?id=${p.id}" 
+          <a href="?slug=${p.slug}" 
              class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
              onclick="document.getElementById('searchPreview').classList.add('hidden')">
             <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-contain rounded">
@@ -170,22 +162,11 @@
       }
     });
 
-    // ====== CART FUNCTIONS ======
-    function addToCart(id){ /* ... */ }
-    function buyNow(id){ /* ... */ }
-    function updateCartCount(){ /* ... */ }
-    function renderCartItems(){ /* ... */ }
-    function increaseQuantity(index){ /* ... */ }
-    function decreaseQuantity(index){ /* ... */ }
-    function removeItem(index){ /* ... */ }
-    function updateCartTotal(){ /* ... */ }
+    // Cart functions placeholder
+    function addToCart(slug){ /* ... */ }
+    function buyNow(slug){ /* ... */ }
 
-    document.getElementById("checkout-btn").addEventListener("click", async () => { /* ... */ });
-
-    // ====== INITIALIZE ======
-    renderCartItems();
     loadProducts();
-    updateCartCount();
   </script>
 
 </body>
