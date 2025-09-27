@@ -9,7 +9,6 @@
 </head>
 <body class="font-sans bg-gradient-to-r from-green-100 to-blue-100 min-h-screen flex flex-col">
 
-<!-- Header -->
 <header class="bg-white shadow sticky top-0 z-50">
   <div class="container mx-auto flex justify-between items-center px-4 py-4">
     <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
@@ -24,24 +23,43 @@
   <h1 class="text-2xl font-bold mb-4 text-gray-700">Your Cart</h1>
   <div id="cart-items" class="space-y-4"></div>
 
-  <div class="mt-6 flex flex-col items-end space-y-4">
+  <div class="mt-6 flex flex-col items-center space-y-4 w-full">
     <div id="cart-total" class="text-lg font-bold text-gray-700">Total: $0.00</div>
-    
-    <!-- Stripe Checkout button -->
-    <button id="checkout-btn" class="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 w-full sm:w-auto">
-      Checkout
-    </button>
 
-    <!-- Payment icons row -->
-    <div class="flex flex-wrap justify-center items-center space-x-4 mt-2">
-      <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" class="h-8">
-      <img src="https://img.icons8.com/color/48/mastercard-logo.png" alt="MasterCard" class="h-8">
-      <img src="https://img.icons8.com/color/48/google-pay.png" alt="Google Pay" class="h-8">
-      <img src="https://www.svgrepo.com/show/303191/apple-pay-logo.svg" alt="Apple Pay" class="h-8">
+    <!-- Payment selection -->
+    <div class="w-full flex flex-col items-center space-y-3 mt-4">
+      <!-- Stripe / Card options -->
+      <label class="flex items-center space-x-2">
+        <input type="radio" name="payment" value="stripe" class="form-radio h-5 w-5 text-indigo-600" checked>
+        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa" class="h-8">
+        <img src="https://img.icons8.com/color/48/mastercard-logo.png" alt="MasterCard" class="h-8">
+        <img src="https://img.icons8.com/color/48/amex.png" alt="AmEx" class="h-8">
+        <img src="https://img.icons8.com/color/48/discover.png" alt="Discover" class="h-8">
+      </label>
+
+      <!-- PayPal -->
+      <label class="flex items-center space-x-2">
+        <input type="radio" name="payment" value="paypal" class="form-radio h-5 w-5 text-indigo-600">
+        <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" class="h-8">
+      </label>
+
+      <!-- Google Pay -->
+      <label class="flex items-center space-x-2">
+        <input type="radio" name="payment" value="googlepay" class="form-radio h-5 w-5 text-indigo-600">
+        <img src="https://img.icons8.com/color/48/google-pay.png" alt="Google Pay" class="h-8">
+      </label>
+
+      <!-- Apple Pay -->
+      <label class="flex items-center space-x-2">
+        <input type="radio" name="payment" value="applepay" class="form-radio h-5 w-5 text-indigo-600">
+        <img src="https://www.svgrepo.com/show/303191/apple-pay-logo.svg" alt="Apple Pay" class="h-8">
+      </label>
     </div>
 
-    <!-- PayPal button -->
-    <div id="paypal-button-container" class="w-full sm:w-auto mt-4"></div>
+    <!-- Proceed to Checkout -->
+    <button id="proceed-btn" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 w-full sm:w-auto">
+      Proceed to Checkout
+    </button>
   </div>
 </main>
 
@@ -49,11 +67,8 @@
   © 2025 DjsDopeDesigns — All Rights Reserved
 </footer>
 
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id=AV2RLwC3CjrbZ8hAPzkf1e1IRiZnZFBUnBGyn2CJRkdqipI7oa_1lCI531VgBT9BHBW5D4PCOLOreBh8&currency=USD"></script>
-
 <script>
-// Load cart from localStorage
+// Load cart
 function renderCartItems() {
   const container = document.getElementById("cart-items");
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -84,12 +99,9 @@ function renderCartItems() {
 
   document.getElementById("cart-total").textContent = `Total: $${total.toFixed(2)}`;
   document.getElementById("cart-count").textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
-  localStorage.setItem("cart", JSON.stringify(cart));
-
   window.cartTotal = total.toFixed(2);
 }
 
-// Cart functions
 function increaseQuantity(index){
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   cart[index].quantity++;
@@ -99,11 +111,8 @@ function increaseQuantity(index){
 
 function decreaseQuantity(index){
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if(cart[index].quantity > 1){
-    cart[index].quantity--;
-  } else {
-    cart.splice(index,1);
-  }
+  if(cart[index].quantity > 1){ cart[index].quantity--; } 
+  else { cart.splice(index,1); }
   localStorage.setItem("cart", JSON.stringify(cart));
   renderCartItems();
 }
@@ -115,48 +124,35 @@ function removeItem(index){
   renderCartItems();
 }
 
-// Initial render
 renderCartItems();
 
-// Stripe checkout
-document.getElementById("checkout-btn").addEventListener("click", async () => {
+// Proceed to Checkout button
+document.getElementById("proceed-btn").addEventListener("click", async () => {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if(cart.length === 0){
-    alert("Your cart is empty!");
-    return;
-  }
-  try {
-    const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart })
-    });
-    const data = await res.json();
-    if(data.url) window.location.href = data.url;
-  } catch(err){
-    console.error("Checkout error:", err);
-    alert("Failed to start checkout. Try again.");
+  if(cart.length === 0){ alert("Your cart is empty!"); return; }
+
+  const selected = document.querySelector('input[name="payment"]:checked').value;
+
+  if(selected === "stripe" || selected === "googlepay" || selected === "applepay") {
+    // Send to your Stripe endpoint
+    try {
+      const res = await fetch("https://djsdope.onrender.com/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart })
+      });
+      const data = await res.json();
+      if(data.url) window.location.href = data.url;
+    } catch(err){
+      console.error("Checkout error:", err);
+      alert("Failed to start checkout. Try again.");
+    }
+  } else if(selected === "paypal") {
+    // Redirect to PayPal checkout page
+    window.location.href = "https://www.paypal.com/checkoutnow"; // replace with your actual PayPal checkout link
   }
 });
-
-// PayPal button (no duplicates)
-paypal.Buttons({
-  style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
-  funding: { disallowed: [ paypal.FUNDING.CREDIT, paypal.FUNDING.PAYLATER ] }, // remove extra buttons
-  createOrder: function(data, actions) {
-    return actions.order.create({
-      purchase_units: [{ amount: { value: window.cartTotal || "0.00" } }]
-    });
-  },
-  onApprove: function(data, actions) {
-    return actions.order.capture().then(function(details) {
-      alert("Transaction completed by " + details.payer.name.given_name + " ✅");
-      localStorage.removeItem("cart");
-      window.location.href = "thankyou.html";
-    });
-  }
-}).render("#paypal-button-container");
-
 </script>
+
 </body>
 </html>
