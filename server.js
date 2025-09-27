@@ -68,7 +68,7 @@ app.get("/download/:productId", (req, res) => {
     "3": "dancing-guy.zip",
     "4": "green-dancer.zip",
     "5": "death-drummer.zip",
-    "6": "wooden-bowl.zip",
+    "6": "dancing-banana.zip",
     "7": "ceramic-mug.zip",
     "8": "leather-wallet.zip",
     "9": "heart-emote.zip"
