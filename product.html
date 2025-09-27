@@ -1,167 +1,176 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
 <head>
+  <!-- ====== HEAD SECTION ====== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product | DJS Dope Designs</title>
+  <title>Product Page</title>
+  <link rel="icon" type="image/png" href="https://images.squarespace-cdn.com/content/v1/5559fdd6e4b0e3eb2cfa9394/64fb3589-910a-41d7-8767-d1e72606ffdb/Cartoon+women.PNG?format=2500w">
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    footer { height: 160px; }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
 
-  <!-- HEADER -->
-  <header class="bg-black text-white p-4 flex justify-between items-center">
-    <a href="index.html" class="text-xl font-bold">DJS Dope Designs</a>
-    <button onclick="toggleCart()" class="relative">
-      🛒
-      <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">0</span>
-    </button>
+<body class="font-sans bg-gradient-to-r from-green-200 to-blue-200 min-h-screen">
+
+  <!-- ====== HEADER ====== -->
+  <header class="bg-white shadow sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center px-4 py-4">
+      <a href="index.html" class="text-xl font-bold">DjsDopeDesigns</a>
+      <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
+        🛒
+        <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
+      </button>
+    </div>
   </header>
 
-  <!-- MAIN PRODUCT -->
-  <main class="max-w-4xl mx-auto p-6">
-    <div id="product-container" class="bg-white rounded-lg shadow-lg p-6 text-center"></div>
-  </main>
-
-  <!-- CART SIDEBAR -->
-  <div id="cart-sidebar" class="fixed top-0 right-0 w-80 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 p-6">
-    <h2 class="text-xl font-bold mb-4">Your Cart</h2>
-    <div id="cart-items" class="space-y-4"></div>
-    <div id="cart-total" class="font-bold text-lg mt-4">Total: $0.00</div>
-    <button onclick="checkout()" class="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded">Checkout</button>
+  <!-- ====== SEARCH BAR ====== -->
+  <div class="container mx-auto px-4 py-4 relative flex justify-center">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Search products..." 
+      class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 mx-auto"
+      oninput="filterProducts()"
+    >
+    <div id="searchPreview" class="absolute top-full left-0 mt-1 w-full md:w-1/2 bg-white border border-gray-200 rounded shadow-md hidden z-50"></div>
   </div>
 
-  <script>
-let products = [];
-const params = new URLSearchParams(window.location.search);
-const featuredSlug = params.get('slug') || null;
+  <!-- ====== FEATURED PRODUCT ====== -->
+  <div class="container mx-auto px-4 my-4 flex justify-center" id="featured-product"></div>
 
-// Load products.json and render products
-async function loadProducts() {
-  try {
-    const res = await fetch('products.json');
-    products = await res.json();
-    renderFeatured();
-    renderOtherProducts(products.filter(p => p.slug !== featuredSlug));
-    updateCartCount();
-  } catch(err) {
-    console.error("Failed to load products:", err);
-  }
-}
+  <!-- ====== OTHER PRODUCTS ====== -->
+  <div class="container mx-auto px-4 mt-8">
+    <div id="other-products" class="grid grid-cols-2 md:grid-cols-4 gap-6 justify-center"></div>
+  </div>
 
-// Featured product
-function renderFeatured() {
-  if(!featuredSlug) return;
-  const featured = products.find(p => p.slug === featuredSlug);
-  if(!featured) return;
-
-  document.title = `${featured.name} | DjsDopeDesigns`;
-
-  const container = document.getElementById("featured-product");
-  container.innerHTML = `
-    <div class="bg-white/80 rounded-lg shadow-md max-w-6xl w-full flex flex-col md:flex-row md:space-x-6 p-4">
-      <div class="md:w-1/2 w-full">
-        <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
-      </div>
-      <div class="md:w-1/2 w-full mt-4 md:mt-0 flex flex-col justify-between relative">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">${featured.name}</h1>
-          <p class="text-gray-500 text-xl mb-4">$${(featured.price/100).toFixed(2)}</p>
-          <p class="text-gray-700 mb-6">${featured.description}</p>
-        </div>
-        <div class="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 fixed bottom-0 left-0 right-0 md:static md:mt-4 bg-white md:bg-transparent p-4 md:p-0 shadow md:shadow-none">
-          <button onclick="orderNow('${featured.slug}')" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded hover:bg-indigo-500 text-lg font-semibold">Order Now</button>
-          <button onclick="addToCart('${featured.slug}')" class="flex-1 bg-gray-200 px-4 py-3 rounded hover:bg-gray-300 text-lg font-semibold">🛒 Add to Cart</button>
-        </div>
-      </div>
+  <!-- ====== SLIDING CART ====== -->
+  <div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" 
+       class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-white border-l-2 border-gray-300 overflow-y-auto z-50">
+    <div class="flex justify-between items-center">
+      <h3 class="text-2xl font-medium text-gray-700">Your cart</h3>
+      <button @click="cartOpen = !cartOpen" class="text-gray-600 focus:outline-none">✕</button>
     </div>
-  `;
-}
+    <hr class="my-3">
+    <div id="cart-items" class="space-y-6"></div>
+    <div class="mt-4 text-lg font-bold text-gray-700 text-right" id="cart-total">Total: $0.00</div>
+    <div class="mt-2 flex justify-center">
+      <button id="checkout-btn" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</button>
+    </div>
+  </div>
 
-// Other products
-function renderOtherProducts(filteredProducts) {
-  const otherContainer = document.getElementById("other-products");
-  otherContainer.innerHTML = '';
-  filteredProducts.forEach(p => {
-    const div = document.createElement('div');
-    div.className = "bg-white/80 p-4 rounded-lg shadow-md flex flex-col items-center justify-between";
-    div.innerHTML = `
-      <div class="w-full aspect-w-1 aspect-h-1 mb-2">
-        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
-      </div>
-      <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
-      <div class="text-sm text-gray-500 mb-2">$${(p.price/100).toFixed(2)}</div>
-      <div class="flex space-x-2">
-        <a href="?slug=${p.slug}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
-        <button onclick="addToCart('${p.slug}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
-      </div>
-    `;
-    otherContainer.appendChild(div);
-  });
-}
+  <!-- ====== FOOTER ====== -->
+  <footer class="md:hidden"></footer>
 
-// ===== Cart Functions =====
-function getCart() {
-  return JSON.parse(localStorage.getItem("cart")) || [];
-}
+  <!-- ====== SCRIPT SECTION ====== -->
+  <script>
+    let products = [];
+    const params = new URLSearchParams(window.location.search);
+    const featuredSlug = params.get('slug') || null;
 
-function saveCart(cart) {
-  localStorage.setItem("cart", JSON.stringify(cart));
-  updateCartCount();
-}
+    async function loadProducts() {
+      try {
+        const res = await fetch('products.json');
+        products = await res.json();
+        renderFeatured();
+        renderOtherProducts(products.filter(p => p.slug !== featuredSlug));
+      } catch(err) {
+        console.error("Failed to load products:", err);
+      }
+    }
 
-function updateCartCount() {
-  const cart = getCart();
-  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  document.getElementById("cart-count").textContent = count;
-}
+    function renderFeatured() {
+      if(!featuredSlug) return;
+      const featured = products.find(p => p.slug === featuredSlug);
+      if(!featured) return;
 
-function addToCart(slug) {
-  const product = products.find(p => p.slug === slug);
-  if(!product) return;
+      // 🔑 Set SEO page title
+      document.title = `${featured.slug.replace(/-/g, " ")} | DjsDopeDesigns`;
 
-  let cart = getCart();
-  const existing = cart.find(item => item.slug === slug);
-  if(existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ ...product, quantity: 1 });
-  }
-  saveCart(cart);
-  alert(`${product.name} added to cart!`);
-}
+      const container = document.getElementById("featured-product");
+      container.innerHTML = `
+        <div class="bg-white/80 rounded-lg shadow-md max-w-6xl w-full flex flex-col md:flex-row md:space-x-6 p-4">
+          <div class="md:w-1/2 w-full">
+            <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
+          </div>
+          <div class="md:w-1/2 w-full mt-4 md:mt-0 flex flex-col justify-between relative">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-800 mb-2">${featured.name}</h1>
+              <p class="text-gray-500 text-xl mb-4">$${(featured.price/100).toFixed(2)}</p>
+              <p class="text-gray-700 mb-6">${featured.description}</p>
+            </div>
+            <div class="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 fixed bottom-0 left-0 right-0 md:static md:mt-4 bg-white md:bg-transparent p-4 md:p-0 shadow md:shadow-none">
+              <button onclick="buyNow('${featured.slug}')" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded hover:bg-indigo-500 text-lg font-semibold">Order Now</button>
+              <button onclick="addToCart('${featured.slug}')" class="flex-1 bg-gray-200 px-4 py-3 rounded hover:bg-gray-300 text-lg font-semibold">🛒 Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
 
-function orderNow(slug) {
-  addToCart(slug);
-  window.location.href = "cart.html"; // redirect to cart page
-}
+    function renderOtherProducts(filteredProducts) {
+      const otherContainer = document.getElementById("other-products");
+      otherContainer.innerHTML = '';
+      filteredProducts.forEach(p => {
+        const div = document.createElement('div');
+        div.className = "bg-white/80 p-4 rounded-lg shadow-md flex flex-col items-center justify-between";
+        div.innerHTML = `
+          <div class="w-full aspect-w-1 aspect-h-1 mb-2">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-contain rounded">
+          </div>
+          <div class="text-sm font-medium text-gray-700 mb-1">${p.name}</div>
+          <div class="text-sm text-gray-500 mb-2">$${(p.price/100).toFixed(2)}</div>
+          <div class="flex space-x-2">
+            <a href="?slug=${p.slug}" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-500">View</a>
+            <button onclick="addToCart('${p.slug}')" class="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300">🛒</button>
+          </div>
+        `;
+        otherContainer.appendChild(div);
+      });
+    }
 
-// ===== Search Bar =====
-function filterProducts() {
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  const preview = document.getElementById("searchPreview");
-  if (!query) { preview.classList.add("hidden"); return; }
-  const filtered = products.filter(p => p.name.toLowerCase().startsWith(query));
-  if(filtered.length === 0) {
-    preview.innerHTML = `<div class="p-2 text-gray-500">No results</div>`;
-  } else {
-    preview.innerHTML = filtered.map(p => `
-      <a href="?slug=${p.slug}" class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded" onclick="document.getElementById('searchPreview').classList.add('hidden')">
-        <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-contain rounded">
-        <span class="text-gray-700">${p.name}</span>
-      </a>
-    `).join("");
-  }
-  preview.classList.remove("hidden");
-}
+    function filterProducts() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const preview = document.getElementById("searchPreview");
 
-document.addEventListener("click", (e) => {
-  if (!document.getElementById("searchInput").contains(e.target) &&
-      !document.getElementById("searchPreview").contains(e.target)) {
-    document.getElementById("searchPreview").classList.add("hidden");
-  }
-});
+      if (!query) {
+        preview.classList.add("hidden");
+        return;
+      }
 
-loadProducts();
-</script>
+      const filtered = products.filter(p => p.name.toLowerCase().startsWith(query));
+
+      if(filtered.length === 0) {
+        preview.innerHTML = `<div class="p-2 text-gray-500">No results</div>`;
+      } else {
+        preview.innerHTML = filtered.map(p => `
+          <a href="?slug=${p.slug}" class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
+             onclick="document.getElementById('searchPreview').classList.add('hidden')">
+            <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-contain rounded">
+            <span class="text-gray-700">${p.name}</span>
+          </a>
+        `).join("");
+      }
+
+      preview.classList.remove("hidden");
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("searchInput").contains(e.target) &&
+          !document.getElementById("searchPreview").contains(e.target)) {
+        document.getElementById("searchPreview").classList.add("hidden");
+      }
+    });
+
+    // Cart functions placeholders
+    function addToCart(slug){ /* ... */ }
+    function buyNow(slug){ /* ... */ }
+
+    loadProducts();
+  </script>
+
 </body>
 </html>
