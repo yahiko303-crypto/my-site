@@ -15,10 +15,35 @@
   }
 
   /* 🔝 Sticky Header */
-  .header { position: sticky; top: 0; background: #fff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.08); z-index: 1000; }
+  .header { 
+    position: sticky; 
+    top: 0; 
+    background: #fff; 
+    padding: 12px 20px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
+    z-index: 1000; 
+    flex-wrap: wrap;
+    gap: 10px;
+  }
   .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
   .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
   #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
+
+  /* 🔍 Search Bar */
+  .search-bar {
+    flex: 1 1 200px;
+    display: flex;
+  }
+  .search-bar input {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+  }
 
   /* 🛍 Responsive Product Grid */
   .products { display: grid; gap: 20px; padding: 20px; justify-content: center; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
@@ -67,6 +92,9 @@
 
 <header class="header">
   <a href="index.html" class="logo">DjsDopeDesigns</a>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search products...">
+  </div>
   <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
 
@@ -93,28 +121,39 @@ fetch('products.json')
   .then(res => res.json())
   .then(products => {
     allProducts = products;
-    const grid = document.getElementById('product-grid');
-    products.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card__shine"></div>
-        <div class="card__glow"></div>
-        <div class="card__content">
-          <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
-          <div class="card__text">
-            <h3 class="card__title">${p.name}</h3>
-            <p class="card__description">$${(p.price/100).toFixed(2)}</p>
-          </div>
-          <div class="card__footer">
-            <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
-          </div>
-        </div>
-      `;
-      card.onclick = () => openLightbox(p);
-      grid.appendChild(card);
-    });
+    renderProducts(products);
   });
+
+function renderProducts(products) {
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = '';
+  products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card__shine"></div>
+      <div class="card__glow"></div>
+      <div class="card__content">
+        <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
+        <div class="card__text">
+          <h3 class="card__title">${p.name}</h3>
+          <p class="card__description">$${(p.price/100).toFixed(2)}</p>
+        </div>
+        <div class="card__footer">
+          <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
+        </div>
+      </div>
+    `;
+    card.onclick = () => openLightbox(p);
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  const query = this.value.toLowerCase();
+  const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
+  renderProducts(filtered);
+});
 
 function addToCart(productId){
   const product = allProducts.find(p=>p.id===productId);
