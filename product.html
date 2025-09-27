@@ -26,11 +26,13 @@
   <div id="searchPreview" class="absolute bg-gray-800 border border-gray-700 rounded shadow-md mt-1 w-full md:w-1/2 hidden z-50"></div>
 </div>
 
-<!-- FEATURED PRODUCT -->
+<!-- FEATURED PRODUCT CENTERED -->
 <div class="container mx-auto px-4 my-4 flex justify-center" id="featured-product"></div>
 
-<!-- OTHER PRODUCTS -->
-<div class="container mx-auto px-4 mt-8" id="other-products" class="grid gap-6 grid-cols-2 md:grid-cols-4"></div>
+<!-- OTHER PRODUCTS GRID -->
+<div class="container mx-auto px-4 mt-8">
+  <div id="other-products" class="grid gap-6 grid-cols-2 md:grid-cols-4 justify-center"></div>
+</div>
 
 <!-- CART SLIDE-IN -->
 <div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-gray-800 border-l-2 border-gray-700 overflow-y-auto z-50">
@@ -66,7 +68,7 @@ function renderFeatured() {
   const featured = products.find(p => p.id === featuredId);
   if(!featured) return;
   const container = document.getElementById("featured-product");
-  container.innerHTML = createProductCard(featured, true); // true = featured
+  container.innerHTML = createProductCard(featured, true);
 }
 
 function renderOtherProducts(filteredProducts) {
@@ -74,7 +76,7 @@ function renderOtherProducts(filteredProducts) {
   container.innerHTML = '';
   filteredProducts.forEach(p => {
     const div = document.createElement('div');
-    div.innerHTML = createProductCard(p, false); // false = smaller card
+    div.innerHTML = createProductCard(p, false);
     container.appendChild(div);
   });
 }
