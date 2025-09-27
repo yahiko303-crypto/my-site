@@ -20,14 +20,6 @@
   .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
   #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
 
-  /* Search */
-  .search-container { position: relative; max-width: 600px; margin: 15px auto; padding: 0 20px; }
-  .search-container input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
-  .search-preview { position: absolute; top: 100%; left: 20px; right: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 2000; display: none; max-height: 300px; overflow-y: auto; }
-  .search-item { display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; }
-  .search-item img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
-  .search-item:hover { background: #f9f9f9; }
-
   /* 🛍 Responsive Product Grid */
   .products { display: grid; gap: 20px; padding: 20px; justify-content: center; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
@@ -62,6 +54,13 @@
   .close-lightbox { position: absolute; top: 10px; right: 10px; cursor: pointer; font-size: 1.5rem; font-weight: bold; }
   .buy-now { background: #fff; color: #000; border: 1px solid #000; }
   .add-cart { background: #000; color: #fff; border: 1px solid #000; }
+
+  /* 📱 Mobile Lightbox Shrink */
+  @media (max-width: 768px) {
+    .lightbox-content {
+      transform: scale(0.9); /* Shrink by 10% */
+    }
+  }
 </style>
 </head>
 <body>
@@ -70,12 +69,6 @@
   <a href="index.html" class="logo">DjsDopeDesigns</a>
   <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
-
-<!-- 🔍 SEARCH -->
-<div class="search-container">
-  <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()">
-  <div id="searchPreview" class="search-preview"></div>
-</div>
 
 <section class="products" id="product-grid"></section>
 
@@ -163,26 +156,6 @@ function buyNow(){
     window.location.href = 'cart.html';
   }
 }
-
-// ===== SEARCH =====
-function filterProducts(){
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  const preview = document.getElementById("searchPreview");
-  if (!query) { preview.style.display = "none"; return; }
-  const filtered = allProducts.filter(p=>p.name.toLowerCase().includes(query));
-  preview.innerHTML = filtered.map(p=>`
-    <div class="search-item" onclick="openLightbox(allProducts.find(prod=>prod.id==='${p.id}'))">
-      <img src="${p.image}" alt="${p.name}"><span>${p.name}</span>
-    </div>
-  `).join('');
-  preview.style.display = filtered.length ? "block" : "none";
-}
-
-document.addEventListener("click",(e)=>{
-  if(!document.getElementById("searchInput").contains(e.target) && !document.getElementById("searchPreview").contains(e.target)){
-    document.getElementById("searchPreview").style.display = "none";
-  }
-});
 </script>
 
 </body>
