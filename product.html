@@ -30,7 +30,7 @@
 <div class="container mx-auto px-4 my-4 flex justify-center" id="featured-product"></div>
 
 <!-- OTHER PRODUCTS -->
-<div class="container mx-auto px-4 mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="other-products"></div>
+<div class="container mx-auto px-4 mt-8" id="other-products" class="grid gap-6 grid-cols-2 md:grid-cols-4"></div>
 
 <!-- CART SLIDE-IN -->
 <div :class="cartOpen ? 'translate-x-0 ease-out' : 'translate-x-full ease-in'" class="fixed right-0 top-0 max-w-xs w-full h-full px-6 py-4 transition transform bg-gray-800 border-l-2 border-gray-700 overflow-y-auto z-50">
@@ -66,7 +66,7 @@ function renderFeatured() {
   const featured = products.find(p => p.id === featuredId);
   if(!featured) return;
   const container = document.getElementById("featured-product");
-  container.innerHTML = createProductCard(featured);
+  container.innerHTML = createProductCard(featured, true); // true = featured
 }
 
 function renderOtherProducts(filteredProducts) {
@@ -74,16 +74,18 @@ function renderOtherProducts(filteredProducts) {
   container.innerHTML = '';
   filteredProducts.forEach(p => {
     const div = document.createElement('div');
-    div.innerHTML = createProductCard(p);
+    div.innerHTML = createProductCard(p, false); // false = smaller card
     container.appendChild(div);
   });
 }
 
-function createProductCard(p) {
+// Create card function: featured = true makes it bigger
+function createProductCard(p, featured){
+  const cardSize = featured ? 'max-w-md w-full' : 'max-w-xs w-full';
   return `
-<div class="max-w-md w-full bg-gray-900 shadow-lg rounded-xl p-6">
-  <div class="relative h-62 w-full mb-3">
-    <img src="${p.image}" alt="${p.name}" class="w-full h-52 object-cover rounded-2xl">
+<div class="${cardSize} bg-gray-900 shadow-lg rounded-xl p-4 mx-auto mb-6">
+  <div class="relative h-48 w-full mb-3">
+    <img src="${p.image}" alt="${p.name}" class="w-full h-40 object-cover rounded-2xl">
   </div>
   <div class="flex-auto justify-evenly">
     <div class="flex flex-wrap mb-2">
@@ -92,9 +94,9 @@ function createProductCard(p) {
         <div class="ml-3 flex items-center bg-green-400 text-white text-xs px-2 py-1 rounded-lg">INSTOCK</div>
       </div>
     </div>
-    <div class="text-xl font-semibold text-white mb-3">$${(p.price/100).toFixed(2)}</div>
+    <div class="text-lg ${featured ? 'text-xl font-semibold' : 'text-base'} text-white mb-3">$${(p.price/100).toFixed(2)}</div>
     <div class="flex space-x-2 text-sm font-medium justify-start">
-      <button onclick="addToCart('${p.id}')" class="transition ease-in duration-300 inline-flex items-center text-sm font-medium bg-purple-500 px-5 py-2 hover:shadow-lg tracking-wider text-white rounded-full hover:bg-purple-600">Add Cart</button>
+      <button onclick="addToCart('${p.id}')" class="transition ease-in duration-300 inline-flex items-center text-sm font-medium bg-purple-500 px-4 py-2 hover:shadow-lg tracking-wider text-white rounded-full hover:bg-purple-600">Add Cart</button>
       <a href="?id=${p.id}" class="transition ease-in duration-300 bg-gray-700 hover:bg-gray-800 border hover:border-gray-500 border-gray-700 hover:text-white text-gray-400 rounded-full w-9 h-9 text-center p-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
