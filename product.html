@@ -54,7 +54,6 @@
   <hr class="my-3">
   <div id="cart-items" class="space-y-6"></div>
 
-  <!-- Total displayed above checkout button -->
   <div class="mt-4 text-lg font-bold text-gray-700 text-right" id="cart-total">Total: $0.00</div>
 
   <div class="mt-2 flex justify-center">
@@ -63,7 +62,6 @@
 </div>
 
 <script>
-// Load products from products.json
 let products = [];
 const params = new URLSearchParams(window.location.search);
 const featuredId = params.get('id') || null;
@@ -79,33 +77,39 @@ async function loadProducts() {
   }
 }
 
-// Render featured product
+// Featured product layout like Etsy
 function renderFeatured() {
   if(!featuredId) return;
   const featured = products.find(p => p.id === featuredId);
   if(!featured) return;
+
   const container = document.getElementById("featured-product");
   container.innerHTML = `
-    <div class="bg-white/80 p-4 rounded-lg shadow-md md:flex md:items-center max-w-4xl w-full">
-      <div class="w-full md:w-1/2">
+    <div class="bg-white/80 rounded-lg shadow-md max-w-6xl w-full flex flex-col md:flex-row md:space-x-6 p-4">
+      <!-- Image -->
+      <div class="md:w-1/2 w-full">
         <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
       </div>
-      <div class="mt-4 md:mt-0 md:ml-6 md:w-1/2 flex flex-col justify-between">
+
+      <!-- Info -->
+      <div class="md:w-1/2 w-full mt-4 md:mt-0 flex flex-col justify-between relative">
         <div>
-          <h2 class="text-xl font-bold text-gray-700">${featured.name}</h2>
-          <p class="text-gray-500 my-2">$${(featured.price/100).toFixed(2)}</p>
-          <p class="text-gray-600 mb-4">${featured.description}</p>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">${featured.name}</h1>
+          <p class="text-gray-500 text-xl mb-4">$${(featured.price/100).toFixed(2)}</p>
+          <p class="text-gray-700 mb-6">${featured.description}</p>
         </div>
-        <div class="flex space-x-2">
-          <button onclick="buyNow('${featured.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Order Now</button>
-          <button onclick="addToCart('${featured.id}')" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">🛒</button>
+
+        <!-- Buttons (sticky on mobile) -->
+        <div class="flex flex-col md:flex-row md:space-x-2 space-y-2 md:space-y-0 fixed bottom-0 left-0 right-0 md:static md:mt-4 bg-white md:bg-transparent p-4 md:p-0 shadow md:shadow-none">
+          <button onclick="buyNow('${featured.id}')" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded hover:bg-indigo-500 text-lg font-semibold">Order Now</button>
+          <button onclick="addToCart('${featured.id}')" class="flex-1 bg-gray-200 px-4 py-3 rounded hover:bg-gray-300 text-lg font-semibold">🛒 Add to Cart</button>
         </div>
       </div>
     </div>
   `;
 }
 
-// Render other products
+// Other products
 function renderOtherProducts(filteredProducts) {
   const otherContainer = document.getElementById("other-products");
   otherContainer.innerHTML = '';
@@ -127,7 +131,7 @@ function renderOtherProducts(filteredProducts) {
   });
 }
 
-// Filter products by search + preview dropdown
+// Search/filter functions
 function filterProducts() {
   const query = document.getElementById("searchInput").value.toLowerCase();
   const preview = document.getElementById("searchPreview");
@@ -151,7 +155,6 @@ function filterProducts() {
   preview.classList.remove("hidden");
 }
 
-// Hide preview when clicking outside
 document.addEventListener("click", (e) => {
   if (!document.getElementById("searchInput").contains(e.target) &&
       !document.getElementById("searchPreview").contains(e.target)) {
@@ -183,12 +186,10 @@ function updateCartCount(){
   updateCartTotal();
 }
 
-// Render cart items
 function renderCartItems() {
   const container = document.getElementById("cart-items");
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   container.innerHTML = '';
-
   cart.forEach((item, index) => {
     const div = document.createElement('div');
     div.className = "flex items-center justify-between bg-gray-50 p-2 rounded shadow";
@@ -207,12 +208,10 @@ function renderCartItems() {
     `;
     container.appendChild(div);
   });
-
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartTotal();
 }
 
-// Quantity controls
 function increaseQuantity(index){
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   cart[index].quantity++;
@@ -241,14 +240,12 @@ function removeItem(index){
   updateCartCount();
 }
 
-// Update total display
 function updateCartTotal(){
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
   const total = cart.reduce((sum,i) => sum + (i.price * i.quantity), 0);
   document.getElementById("cart-total").textContent = `Total: $${total.toFixed(2)}`;
 }
 
-// Checkout
 document.getElementById("checkout-btn").addEventListener("click", async () => {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   if(cart.length === 0){
@@ -269,7 +266,6 @@ document.getElementById("checkout-btn").addEventListener("click", async () => {
   }
 });
 
-// Initial render
 renderCartItems();
 loadProducts();
 updateCartCount();
