@@ -79,28 +79,40 @@ async function loadProducts() {
   }
 }
 
-// Render featured product
+// Render featured product with desktop right / mobile below layout
 function renderFeatured() {
   if(!featuredId) return;
   const featured = products.find(p => p.id === featuredId);
   if(!featured) return;
   const container = document.getElementById("featured-product");
   container.innerHTML = `
-    <div class="bg-white/80 p-4 rounded-lg shadow-md md:flex md:items-center max-w-4xl w-full">
+    <div class="bg-white/80 p-4 rounded-lg shadow-md max-w-4xl w-full
+                flex flex-col md:flex-row md:items-start">
+      <!-- Image -->
       <div class="w-full md:w-1/2">
         <img src="${featured.image}" alt="${featured.name}" class="w-full h-auto object-contain rounded-lg">
       </div>
-      <div class="mt-4 md:mt-0 md:ml-6 md:w-1/2 flex flex-col justify-between">
+
+      <!-- Info -->
+      <div class="w-full md:w-1/2 mt-4 md:mt-0 md:ml-6 flex flex-col justify-between relative">
         <div>
           <h2 class="text-xl font-bold text-gray-700">${featured.name}</h2>
           <p class="text-gray-500 my-2">$${(featured.price/100).toFixed(2)}</p>
-          <p class="text-gray-600 mb-4">${featured.description}</p>
-        </div>
-        <div class="flex space-x-2">
-          <button onclick="buyNow('${featured.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Order Now</button>
-          <button onclick="addToCart('${featured.id}')" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">🛒</button>
+          <p class="text-gray-600 mb-20">${featured.description}</p>
         </div>
       </div>
+    </div>
+
+    <!-- Sticky buttons (full-width on mobile) -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-md flex space-x-2 px-4 py-3 md:static md:bg-transparent md:shadow-none md:mt-4">
+      <button onclick="buyNow('${featured.id}')" 
+        class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">
+        Order Now
+      </button>
+      <button onclick="addToCart('${featured.id}')" 
+        class="flex-1 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">
+        🛒 Add to Cart
+      </button>
     </div>
   `;
 }
