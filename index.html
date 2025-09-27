@@ -1,179 +1,155 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ cartOpen: false }" class="bg-gray-100">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DjsDopeDesigns</title>
-  <link rel="icon" type="image/png" href="https://images.squarespace-cdn.com/content/v1/5559fdd6e4b0e3eb2cfa9394/64fb3589-910a-41d7-8767-d1e72606ffdb/Cartoon+women.PNG?format=2500w">
-  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body { font-family: "Helvetica Neue", Arial, sans-serif; margin:0; min-height:100vh; background:linear-gradient(to right,#d9fdd3,#d3e9ff); color:#333; }
-    .header { position:sticky; top:0; background:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 6px rgba(0,0,0,0.08); z-index:1000; }
-    .logo { font-weight:bold; font-size:1.2rem; text-decoration:none; color:#222; }
-    .cart { position:relative; font-size:1.4rem; text-decoration:none; color:#444; }
-    #cart-count { position:absolute; top:-8px; right:-10px; background:#f1641e; color:#fff; border-radius:50%; padding:2px 7px; font-size:12px; font-weight:bold; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DjsDopeDesigns</title>
+<link rel="icon" type="image/png" href="https://images.squarespace-cdn.com/content/v1/5559fdd6e4b0e3eb2cfa9394/64fb3589-910a-41d7-8767-d1e72606ffdb/Cartoon+women.PNG?format=2500w">
+<style>
+  body { 
+    font-family: "Helvetica Neue", Arial, sans-serif; 
+    margin: 0; 
+    min-height: 100vh;
+    background: linear-gradient(to right, #d9fdd3, #d3e9ff);
+    color: #333;
+  }
 
-    .products { display:grid; gap:20px; padding:20px; justify-content:center; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
-    .card { background: rgba(255,255,255,0.8); border-radius:20px; position:relative; overflow:hidden; transition:all 0.5s ease; box-shadow:0 10px 15px -3px rgba(0,0,0,0.05); border:1px solid rgba(255,255,255,0.3); display:flex; flex-direction:column; backdrop-filter:blur(6px); cursor:pointer; }
-    .card__content { padding:1.25em; display:flex; flex-direction:column; gap:0.75em; position:relative; z-index:2; flex:1 1 auto; }
-    .card__image { width:100%; flex-shrink:0; border-radius:12px; overflow:hidden; max-height:140px; }
-    .card__image img { width:100%; height:100%; object-fit:cover; display:block; }
-    .card__title { font-size:1.1em; font-weight:700; margin:0; color:#1e293b; }
-    .card__description { font-size:0.75em; margin:0; opacity:0.7; color:#1e293b; }
-    .card__footer { display:flex; justify-content:center; align-items:center; margin-top:auto; }
-    button { font-size:17px; font-weight:bold; border:none; cursor:pointer; border-radius:0.75em; width:100%; height:40px; display:flex; align-items:center; justify-content:center; transition: all 0.3s ease; }
-    .button_top { display:block; width:100%; text-align:center; color:white; transform:scale(0.9); transition: all 0.3s ease; }
-    button:hover .button_top { transform:scale(1); }
-    button:active .button_top { transform:scale(0.95); }
+  /* 🔝 Sticky Header */
+  .header { position: sticky; top: 0; background: #fff; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 6px rgba(0,0,0,0.08); z-index: 1000; }
+  .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
+  .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
+  #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
 
-    /* SLIDING CART */
-    .cart-slide { 
-      transition: transform 0.3s ease-in-out; 
-      transform: translateX(100%); 
-      position: fixed; top:0; right:0; width:100%; max-width:300px; height:100%; background:white; border-left:2px solid #ccc; padding:1rem; overflow-y:auto; z-index:9999;
-    }
-    .cart-slide.open { transform: translateX(0); }
+  /* 🛍 Responsive Product Grid */
+  .products { display: grid; gap: 20px; padding: 20px; justify-content: center; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
-    @media (max-width: 768px) { .products { grid-template-columns:repeat(2,1fr); } }
-    @media (min-width: 769px) { .products { grid-template-columns:repeat(4,1fr); max-width:1200px; margin:0 auto; gap:20px; } .card__image { max-height:none; flex-grow:1; } }
-  </style>
+  .card { --card-bg: rgba(255,255,255,0.8); background: var(--card-bg); border-radius: 20px; position: relative; overflow: hidden; transition: all 0.5s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.3); display: flex; flex-direction: column; backdrop-filter: blur(6px); }
+  .card__shine { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%); opacity: 0; transition: opacity 0.3s ease; }
+  .card__glow { position: absolute; inset: -10px; background: radial-gradient(circle at 50% 0%, rgba(124,58,237,0.25) 0%, rgba(124,58,237,0) 70%); opacity: 0; transition: opacity 0.5s ease; }
+  .card__content { padding: 1.25em; display: flex; flex-direction: column; gap: 0.75em; position: relative; z-index: 2; flex: 1 1 auto; }
+  .card__image { width: 100%; flex-shrink: 0; border-radius: 12px; overflow: hidden; max-height: 140px; }
+  .card__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card__text { display: flex; flex-direction: column; gap: 0.25em; }
+  .card__title { color: #1e293b; font-size: 1.1em; margin: 0; font-weight: 700; }
+  .card__description { color: #1e293b; font-size: 0.75em; margin: 0; opacity: 0.7; }
+  .card__footer { display: flex; justify-content: center; align-items: center; margin-top: auto; }
+
+  button { font-size: 17px; font-weight: bold; border: none; cursor: pointer; border-radius: 0.75em; width: 100%; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+  .button_top { display: block; width: 100%; text-align: center; color: white; transform: scale(0.9); transition: all 0.3s ease; }
+  button:hover .button_top { transform: scale(1); }
+  button:active .button_top { transform: scale(0.95); }
+
+  .card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15), 0 10px 10px -5px rgba(0,0,0,0.05); border-color: rgba(124,58,237,0.25); }
+  .card:hover .card__shine { opacity: 1; animation: shine 3s infinite; }
+  .card:hover .card__glow { opacity: 1; }
+  @keyframes shine { 0% { background-position: -100% 0; } 100% { background-position: 200% 0; } }
+
+  @media (max-width: 768px) { .products { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 769px) { .products { grid-template-columns: repeat(4, 1fr); max-width: 1200px; margin: 0 auto; gap: 20px; } .card__image { max-height: none; flex-grow: 1; } }
+
+  /* ===== LIGHTBOX ===== */
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 10000; padding: 20px; overflow-y: auto; }
+  .lightbox-content { background: white; padding: 20px; border-radius: 12px; max-width: 500px; width: 100%; display: flex; flex-direction: column; gap: 12px; position: relative; }
+  .lightbox img { width: 100%; border-radius: 12px; object-fit: contain; }
+  .close-lightbox { position: absolute; top: 10px; right: 10px; cursor: pointer; font-size: 1.5rem; font-weight: bold; }
+  .buy-now { background: #fff; color: #000; border: 1px solid #000; }
+  .add-cart { background: #000; color: #fff; border: 1px solid #000; }
+</style>
 </head>
 <body>
 
 <header class="header">
   <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <button @click="cartOpen = !cartOpen" class="relative text-gray-700 text-xl">
-    🛒
-    <span id="cart-count" class="absolute -top-2 -right-3 bg-orange-500 text-white rounded-full text-xs px-2">0</span>
-  </button>
+  <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
 
-<div class="container mx-auto px-4 py-4 relative flex justify-center">
-  <input type="text" id="searchInput" placeholder="Search products..." class="w-full md:w-1/2 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 mx-auto" oninput="filterProducts()">
-  <div id="searchPreview" class="absolute top-full left-0 mt-1 w-full md:w-1/2 bg-white border border-gray-200 rounded shadow-md hidden z-50"></div>
-</div>
+<section class="products" id="product-grid"></section>
 
-<div class="products" id="product-grid"></div>
-
-<!-- SLIDING CART -->
-<div id="cart-slide" class="cart-slide" :class="{ 'open': cartOpen }">
-  <div class="flex justify-between items-center">
-    <h3 class="text-2xl font-medium text-gray-700">Your Cart</h3>
-    <button @click="cartOpen = false" class="text-gray-600 focus:outline-none">✕</button>
-  </div>
-  <hr class="my-3">
-  <div id="cart-items" class="space-y-4"></div>
-  <div class="mt-4 text-lg font-bold text-gray-700 text-right" id="cart-total">Total: $0.00</div>
-  <div class="mt-2 flex justify-center">
-    <button id="checkout-btn" class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500">Checkout</button>
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-content" id="lightbox-content">
+    <span class="close-lightbox" onclick="closeLightbox()">×</span>
+    <img id="lightbox-image" src="" alt="">
+    <h2 id="lightbox-title"></h2>
+    <p id="lightbox-price"></p>
+    <p id="lightbox-description"></p>
+    <button class="buy-now" onclick="buyNow()">Buy Now</button>
+    <button class="add-cart" onclick="addToCartLightbox()">Add to Cart</button>
   </div>
 </div>
-
-<footer class="md:hidden"></footer>
 
 <script>
 let allProducts = [];
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let currentProduct = null;
 
-function updateCartCount(){
-  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
-  document.getElementById("cart-count").textContent = total;
-}
-
-function renderCartItems(){
-  const container = document.getElementById("cart-items");
-  container.innerHTML = '';
-  let totalPrice = 0;
-  cart.forEach((item,index)=>{
-    const div = document.createElement('div');
-    div.className = "flex justify-between items-center border-b pb-2";
-    div.innerHTML = `
-      <div class="flex items-center gap-2">
-        <img src="${item.image}" class="w-12 h-12 object-contain rounded">
-        <div>
-          <div>${item.name}</div>
-          <div class="text-sm text-gray-500">$${item.price.toFixed(2)} x ${item.quantity}</div>
-        </div>
-      </div>
-      <div class="flex gap-1">
-        <button onclick="decreaseQuantity(${index})">-</button>
-        <button onclick="increaseQuantity(${index})">+</button>
-        <button onclick="removeItem(${index})">x</button>
-      </div>
-    `;
-    container.appendChild(div);
-    totalPrice += item.price * item.quantity;
-  });
-  document.getElementById("cart-total").textContent = `Total: $${totalPrice.toFixed(2)}`;
-  localStorage.setItem("cart", JSON.stringify(cart));
-  updateCartCount();
-}
-
-function addToCart(productId){
-  const product = allProducts.find(p=>p.id===productId);
-  if(!product) return;
-  const existing = cart.find(i=>i.id===productId);
-  if(existing) existing.quantity++;
-  else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
-  renderCartItems();
-}
-
-function increaseQuantity(index){ cart[index].quantity++; renderCartItems(); }
-function decreaseQuantity(index){ if(cart[index].quantity>1){cart[index].quantity--; renderCartItems();} }
-function removeItem(index){ cart.splice(index,1); renderCartItems(); }
-
-document.getElementById("checkout-btn").addEventListener("click", ()=>{
-  localStorage.setItem("cart", JSON.stringify(cart));
-  window.location.href="cart.html";
-});
-
-// LOAD PRODUCTS
 fetch('products.json')
-  .then(res=>res.json())
-  .then(products=>{
+  .then(res => res.json())
+  .then(products => {
     allProducts = products;
     const grid = document.getElementById('product-grid');
-    products.forEach(p=>{
+    products.forEach(p => {
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
+        <div class="card__shine"></div>
+        <div class="card__glow"></div>
         <div class="card__content">
           <div class="card__image"><img src="${p.image}" alt="${p.name}"></div>
-          <div class="card__title">${p.name}</div>
-          <div class="card__description">$${(p.price/100).toFixed(2)}</div>
+          <div class="card__text">
+            <h3 class="card__title">${p.name}</h3>
+            <p class="card__description">$${(p.price/100).toFixed(2)}</p>
+          </div>
           <div class="card__footer">
             <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
           </div>
         </div>
       `;
+      card.onclick = () => openLightbox(p);
       grid.appendChild(card);
     });
   });
 
-// SEARCH FILTER
-function filterProducts() {
-  const query = document.getElementById("searchInput").value.toLowerCase();
-  const preview = document.getElementById("searchPreview");
-  if (!query) { preview.classList.add("hidden"); return; }
-  const filtered = allProducts.filter(p=>p.name.toLowerCase().startsWith(query));
-  preview.innerHTML = filtered.map(p=>`
-    <a href="?id=${p.id}" class="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
-       onclick="document.getElementById('searchPreview').classList.add('hidden')">
-       <img src="${p.image}" class="w-10 h-10 object-contain rounded">${p.name}
-    </a>`).join('');
-  preview.classList.remove("hidden");
+function addToCart(productId){
+  const product = allProducts.find(p=>p.id===productId);
+  if(!product) return;
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const existing = cart.find(i=>i.id===productId);
+  if(existing) existing.quantity++;
+  else cart.push({id:product.id,name:product.name,price:product.price/100,quantity:1,image:product.image});
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCartCount();
+  alert(`${product.name} added to cart!`);
 }
 
-document.addEventListener("click",(e)=>{
-  if(!document.getElementById("searchInput").contains(e.target) && !document.getElementById("searchPreview").contains(e.target)){
-    document.getElementById("searchPreview").classList.add("hidden");
-  }
-});
-
-renderCartItems();
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const total = cart.reduce((sum,i)=>sum+i.quantity,0);
+  document.getElementById("cart-count").textContent = total;
+}
 updateCartCount();
+
+// ===== LIGHTBOX FUNCTIONS =====
+function openLightbox(product){
+  currentProduct = product;
+  document.getElementById('lightbox-image').src = product.image;
+  document.getElementById('lightbox-title').textContent = product.name;
+  document.getElementById('lightbox-price').textContent = `$${(product.price/100).toFixed(2)}`;
+  document.getElementById('lightbox-description').textContent = product.description || '';
+  document.getElementById('lightbox').style.display = 'flex';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').style.display = 'none';
+}
+function addToCartLightbox(){
+  if(currentProduct) addToCart(currentProduct.id);
+}
+function buyNow(){
+  if(currentProduct) {
+    addToCart(currentProduct.id);
+    // Scroll to cart or redirect to checkout page
+    window.location.href = 'cart.html';
+  }
+}
 </script>
 
 </body>
