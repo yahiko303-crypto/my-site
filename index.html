@@ -25,24 +25,25 @@
     justify-content: space-between; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
     z-index: 1000; 
-    flex-wrap: wrap;
-    gap: 10px;
   }
   .logo { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #222; }
   .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
   #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
 
-  /* 🔍 Search Bar */
+  /* 🔍 Search Bar (restored below header) */
   .search-bar {
-    flex: 1 1 200px;
-    display: flex;
+    padding: 15px;
+    text-align: center;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   }
   .search-bar input {
-    flex: 1;
-    padding: 6px 10px;
-    border-radius: 6px;
+    width: 90%;
+    max-width: 500px;
+    padding: 10px 14px;
+    border-radius: 8px;
     border: 1px solid #ccc;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   /* 🛍 Responsive Product Grid */
@@ -92,11 +93,13 @@
 
 <header class="header">
   <a href="index.html" class="logo">DjsDopeDesigns</a>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search products...">
-  </div>
   <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
+
+<!-- 🔍 Search bar below header -->
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search products...">
+</div>
 
 <section class="products" id="product-grid"></section>
 
