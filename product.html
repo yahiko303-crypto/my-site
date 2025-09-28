@@ -77,6 +77,7 @@
         products = await res.json();
         renderFeatured();
         renderOtherProducts(products.filter(p => p.slug !== featuredSlug));
+        updateCartCount();
       } catch(err) {
         console.error("Failed to load products:", err);
       }
@@ -165,9 +166,29 @@
       }
     });
 
-    // Cart functions placeholders
-    function addToCart(slug){ /* ... */ }
-    function buyNow(slug){ /* ... */ }
+    // ===== CART FUNCTIONS =====
+    function addToCart(slug){
+      const product = products.find(p => p.slug === slug);
+      if(!product) return;
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existing = cart.find(i=>i.slug===slug);
+      if(existing) existing.quantity++;
+      else cart.push({slug:product.slug,name:product.name,price:product.price/100,quantity:1,image:product.image});
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+      alert(`${product.name} added to cart!`);
+    }
+
+    function updateCartCount(){
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const total = cart.reduce((sum,i)=>sum+i.quantity,0);
+      document.getElementById("cart-count").textContent = total;
+    }
+
+    function buyNow(slug){
+      addToCart(slug);
+      window.location.href = 'cart.html';
+    }
 
     loadProducts();
   </script>
