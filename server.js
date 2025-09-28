@@ -3,14 +3,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
 import cors from "cors";
+import fetch from "node-fetch"; // ✅ For PayPal API calls
 
 // Load environment variables
-import 'dotenv/config';
+import "dotenv/config";
 
 const app = express();
 const PORT = 4000;
 
-// Initialize Stripe using your secret key from .env
+// Stripe setup
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2022-11-15" });
 
 // Helper for __dirname in ES modules
@@ -18,9 +19,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Enable CORS
-app.use(cors({
-  origin: "https://djsdopedesigns.com"
-}));
+app.use(
+  cors({
+    origin: "https://djsdopedesigns.com",
+  })
+);
 
 // Serve static files
 app.use(express.static(__dirname));
@@ -28,27 +31,31 @@ app.use(express.static(__dirname));
 // JSON parser
 app.use(express.json());
 
-// Stripe Checkout session route
+/* ================================
+   STRIPE CHECKOUT
+================================ */
 app.post("/create-checkout-session", async (req, res) => {
   const { items } = req.body;
   if (!items || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
   try {
-    const line_items = items.map(i => ({
+    const line_items = items.map((i) => ({
       price_data: {
         currency: "usd",
         product_data: { name: i.name },
-        unit_amount: Math.round(i.price * 100)
+        unit_amount: Math.round(i.price * 100),
       },
-      quantity: i.quantity
+      quantity: i.quantity,
     }));
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: `https://djsdopedesigns.com/download-success.html?products=${items.map(i => i.id).join(',')}`,
-cancel_url: `https://djsdopedesigns.com/cart.html`
+      success_url: `https://djsdopedesigns.com/download-success.html?products=${items
+        .map((i) => i.id)
+        .join(",")}`,
+      cancel_url: `https://djsdopedesigns.com/cart.html`,
     });
 
     res.json({ url: session.url });
@@ -58,7 +65,57 @@ cancel_url: `https://djsdopedesigns.com/cart.html`
   }
 });
 
-// Download route (unchanged)
+/* ================================
+   PAYPAL CHECKOUT
+================================ */
+
+// Step 1: Capture PayPal order
+app.post("/capture-paypal-order", async (req, res) => {
+  const { orderID } = req.body;
+
+  try {
+    // Get access token from PayPal
+    const auth = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization:
+          "Basic " +
+          Buffer.from(
+            process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+          ).toString("base64"),
+      },
+      body: "grant_type=client_credentials",
+    });
+    const authData = await auth.json();
+
+    // Capture order
+    const capture = await fetch(
+      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.access_token}`,
+        },
+      }
+    );
+    const data = await capture.json();
+
+    if (data.status === "COMPLETED") {
+      res.json({ success: true });
+    } else {
+      res.status(400).json({ success: false, details: data });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+/* ================================
+   FILE DOWNLOADS
+================================ */
 app.get("/download/:productId", (req, res) => {
   const productId = req.params.productId;
 
@@ -71,14 +128,14 @@ app.get("/download/:productId", (req, res) => {
     "6": "dancing-banana.zip",
     "7": "ceramic-mug.zip",
     "8": "leather-wallet.zip",
-    "9": "heart-emote.zip"
+    "9": "heart-emote.zip",
   };
 
   const fileName = files[productId];
   if (!fileName) return res.status(404).send("File not found");
 
   const filePath = path.join(__dirname, "digital", fileName);
-  res.download(filePath, fileName, err => {
+  res.download(filePath, fileName, (err) => {
     if (err) {
       console.error("Download error:", err);
       res.status(500).send("Error downloading file");
