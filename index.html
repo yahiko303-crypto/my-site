@@ -159,7 +159,9 @@ function renderProducts(products) {
           <p class="card__description">$${(p.price/100).toFixed(2)}</p>
         </div>
         <div class="card__footer">
-          <button onclick="addToCart('${p.id}'); event.stopPropagation();"><span class="button_top">Add to Cart</span></button>
+          <button class="add-cart" onclick="addToCart('${p.id}'); event.stopPropagation();">
+  <span class="button_top">Add to Cart</span>
+</button>
         </div>
       </div>
     `;
