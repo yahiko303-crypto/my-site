@@ -30,7 +30,7 @@
   .cart { position: relative; font-size: 1.4rem; text-decoration: none; color: #444; }
   #cart-count { position: absolute; top: -8px; right: -10px; background: #f1641e; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; }
 
-  /* 🔍 Search Bar (restored below header) */
+  /* 🔍 Search Bar */
   .search-bar {
     padding: 15px;
     text-align: center;
@@ -84,7 +84,7 @@
   /* 📱 Mobile Lightbox Shrink */
   @media (max-width: 768px) {
     .lightbox-content {
-      transform: scale(0.9); /* Shrink by 10% */
+      transform: scale(0.9);
     }
   }
 </style>
@@ -92,11 +92,10 @@
 <body>
 
 <header class="header">
-  <!-- Use logo from assets folder -->
-    <a href="index.html">
-      <img src="assets/6.png" alt="DjsDopeDesigns Logo" 
+  <a href="index.html">
+    <img src="assets/6.png" alt="DjsDopeDesigns Logo" 
      style="max-height: 80px; max-width: 300px;">
-    </a>
+  </a>
   <a href="cart.html" class="cart">🛒 <span id="cart-count">0</span></a>
 </header>
 
@@ -105,6 +104,10 @@
   <input type="text" id="searchInput" placeholder="Search products...">
 </div>
 
+<!-- ====== FEATURED PRODUCT ====== -->
+<div class="container mx-auto px-4 my-4 flex justify-center" id="featured-product"></div>
+
+<!-- 🛍 Product Grid -->
 <section class="products" id="product-grid"></section>
 
 <!-- LIGHTBOX -->

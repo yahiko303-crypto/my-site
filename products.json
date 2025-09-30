@@ -1,50 +1,8 @@
 [
-  {
-    "id": "1",
-    "slug": "animated-emote-drake-dancing",
-    "name": "Drake Dancing",
-    "price": 50,
-    "image": "images/1drake-dancing.gif",
-    "description": "Drake doing the hotline."
-  },
-  {
-    "id": "2",
-    "slug": "animated-emote-hammer-girl",
-    "name": "Hammer Girl",
-    "price": 350,
-    "image": "images/2hammer-girl.gif",
-    "description": "Hammer Girl in action."
-  },
-  {
-    "id": "3",
-    "slug": "animated-emote-dancing-guy",
-    "name": "Dancing Guy",
-    "price": 350,
-    "image": "images/3dancing-Guy.gif",
-    "description": "Funny dancing guy."
-  },
-  {
-    "id": "4",
-    "slug": "animated-emote-green-dancer",
-    "name": "Green Dancer",
-    "price": 350,
-    "image": "images/4green-dancer.gif",
-    "description": "Green dancer animation."
-  },
-  {
-    "id": "5",
-    "slug": "animated-emote-death-drummer",
-    "name": "Death Drummer",
-    "price": 350,
-    "image": "images/5death-drummer.gif",
-    "description": "Death Drummer rocking."
-  },
-  {
-    "id": "6",
-    "slug": "animated-emote-dancing-bananas",
-    "name": "Dancing Bananas",
-    "price": 70,
-    "image": "images/6dancing-banana.gif",
-    "description": "Banana dance time."
-  }
+  {"id":"1","name":"Drake Dancing","price":50,"image":"images/1drake-dancing.gif","description":"Drake doing the hotline.","featured": true, "priority": 2},
+  {"id":"2","name":"Hammer Girl","price":350,"image":"images/2hammer-girl.gif","description":"Hammer Girl in action."},
+  {"id":"3","name":"Dancing Guy","price":350,"image":"images/3dancing-Guy.gif","description":"Funny dancing guy.","featured": true, "priority": 1},
+  {"id":"4","name":"Green Dancer","price":350,"image":"images/4green-dancer.gif","description":"Green dancer animation."},
+  {"id":"5","name":"Death Drummer","price":350,"image":"images/5death-drummer.gif","description":"Death Drummer rocking."},
+  {"id":"6","name":"Dancing Bananas","price":70,"image":"images/6dancing-banana.gif","description":"Banana dance time."}
 ]
