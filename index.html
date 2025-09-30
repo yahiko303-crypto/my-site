@@ -130,8 +130,17 @@ let currentProduct = null;
 fetch('products.json')
   .then(res => res.json())
   .then(products => {
-    allProducts = products;
-    renderProducts(products);
+    // separate featured vs non-featured
+    const featured = products
+      .filter(p => p.featured)
+      .sort((a, b) => (a.priority || 999) - (b.priority || 999));
+
+    const nonFeatured = products.filter(p => !p.featured);
+
+    // featured first, keep non-featured in JSON order
+    allProducts = [...featured, ...nonFeatured];
+
+    renderProducts(allProducts);
   });
 
 function renderProducts(products) {
