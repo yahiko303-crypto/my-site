@@ -3,16 +3,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
 import cors from "cors";
-import fetch from "node-fetch"; // For PayPal API calls
-import session from "express-session";
-import bcrypt from "bcrypt";
-import geoip from "geoip-lite";
+import fetch from "node-fetch"; // ✅ For PayPal API calls
 
 // Load environment variables
 import "dotenv/config";
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = 4000;
 
 // Stripe setup
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2022-11-15" });
@@ -33,118 +30,16 @@ app.use(express.static(__dirname));
 
 // JSON parser
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// ================================
-// Visitor logging middleware
-// ================================
-const visitorLogs = [];
-
-app.set("trust proxy", true); // ensures x-forwarded-for is correct behind proxies
-app.use((req, res, next) => {
-  const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const geo = geoip.lookup(clientIp);
-
-  visitorLogs.push({
-    ip: clientIp,
-    location: geo ? `${geo.city || "N/A"}, ${geo.region || "N/A"}, ${geo.country || "N/A"}` : "Unknown",
-    time: new Date().toISOString(),
-    path: req.originalUrl,
-  });
-
-  next();
-});
-
-// ================================
-// Configure session
-// ================================
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "supersecretkey",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false }, // set true if using HTTPS
-  })
-);
-
-// Example admin user
-const adminUser = {
-  username: "admin",
-  passwordHash: bcrypt.hashSync("mypassword", 10),
-};
-
-// Middleware to protect private routes
-function requireLogin(req, res, next) {
-  if (req.session.user) next();
-  else res.redirect("/login");
-}
-
-// ================================
-// Public: Login page
-// ================================
-app.get("/login", (req, res) => {
-  res.send(`
-    <h2>Login</h2>
-    <form method="post" action="/login">
-      <input type="text" name="username" placeholder="Username" required /><br/>
-      <input type="password" name="password" placeholder="Password" required /><br/>
-      <button type="submit">Login</button>
-    </form>
-  `);
-});
-
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  if (username === adminUser.username && (await bcrypt.compare(password, adminUser.passwordHash))) {
-    req.session.user = { username };
-    res.redirect("/dashboard");
-  } else {
-    res.send("Invalid credentials. <a href='/login'>Try again</a>");
-  }
-});
-
-// ================================
-// Protected dashboard
-// ================================
-app.get("/dashboard", requireLogin, (req, res) => {
-  let html = `
-    <h2>Welcome, ${req.session.user.username}</h2>
-    <p>Visitor Logs:</p>
-    <table border="1" cellpadding="5">
-      <tr>
-        <th>IP</th>
-        <th>Location</th>
-        <th>Time</th>
-        <th>Page</th>
-      </tr>
-  `;
-  visitorLogs.slice(-50).reverse().forEach(log => {
-    html += `
-      <tr>
-        <td>${log.ip}</td>
-        <td>${log.location}</td>
-        <td>${log.time}</td>
-        <td>${log.path}</td>
-      </tr>
-    `;
-  });
-  html += "</table><a href='/logout'>Logout</a>";
-  res.send(html);
-});
-
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => res.redirect("/login"));
-});
-
-// ================================
-// Stripe Checkout
-// ================================
+/* ================================
+   STRIPE CHECKOUT
+================================ */
 app.post("/create-checkout-session", async (req, res) => {
   const { items } = req.body;
   if (!items || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
   try {
-    const line_items = items.map(i => ({
+    const line_items = items.map((i) => ({
       price_data: {
         currency: "usd",
         product_data: { name: i.name },
@@ -157,7 +52,9 @@ app.post("/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items,
       mode: "payment",
-      success_url: `https://djsdopedesigns.com/download-success.html?products=${items.map(i => i.id).join(",")}`,
+      success_url: `https://djsdopedesigns.com/download-success.html?products=${items
+        .map((i) => i.id)
+        .join(",")}`,
       cancel_url: `https://djsdopedesigns.com/cart.html`,
     });
 
@@ -168,47 +65,60 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
-// ================================
-// PayPal Checkout
-// ================================
+/* ================================
+   PAYPAL CHECKOUT
+================================ */
+
+// Step 1: Capture PayPal order
 app.post("/capture-paypal-order", async (req, res) => {
   const { orderID } = req.body;
 
   try {
+    // Get access token from PayPal
     const auth = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization:
           "Basic " +
-          Buffer.from(process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY).toString("base64"),
+          Buffer.from(
+            process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+          ).toString("base64"),
       },
       body: "grant_type=client_credentials",
     });
     const authData = await auth.json();
 
-    const capture = await fetch(`https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authData.access_token}`,
-      },
-    });
+    // Capture order
+    const capture = await fetch(
+      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.access_token}`,
+        },
+      }
+    );
     const data = await capture.json();
 
-    if (data.status === "COMPLETED") res.json({ success: true });
-    else res.status(400).json({ success: false, details: data });
+    if (data.status === "COMPLETED") {
+      res.json({ success: true });
+    } else {
+      res.status(400).json({ success: false, details: data });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false });
   }
 });
 
-// ================================
-// File downloads
-// ================================
+/* ================================
+   FILE DOWNLOADS
+================================ */
 app.get("/download/:productId", (req, res) => {
   const productId = req.params.productId;
+
   const files = {
     "1": "drake-dancing.zip",
     "2": "hammer-girl.zip",
@@ -225,7 +135,7 @@ app.get("/download/:productId", (req, res) => {
   if (!fileName) return res.status(404).send("File not found");
 
   const filePath = path.join(__dirname, "digital", fileName);
-  res.download(filePath, fileName, err => {
+  res.download(filePath, fileName, (err) => {
     if (err) {
       console.error("Download error:", err);
       res.status(500).send("Error downloading file");
