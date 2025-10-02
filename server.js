@@ -2,16 +2,32 @@ import express from "express";
 import session from "express-session";
 import bcrypt from "bcrypt";
 import path from "path";
-import geoip from "geoip-lite"; // ✅ Added for IP/location logging
+import geoip from "geoip-lite";
+import Stripe from "stripe";
+import cors from "cors";
+import fetch from "node-fetch"; // For PayPal API calls
+import "dotenv/config";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.set('trust proxy', true);
+// ================================
+// Stripe setup
+// ================================
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2022-11-15" });
 
+// ================================
+// Trust proxy
+// ================================
+app.set("trust proxy", true);
+
+// ================================
 // Middleware
+// ================================
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(path.resolve(), "public"))); // serve static files
 
 // ================================
 // Visitor logging middleware
@@ -24,7 +40,9 @@ app.use((req, res, next) => {
 
   visitorLogs.push({
     ip: clientIp,
-    location: geo ? `${geo.city || 'N/A'}, ${geo.region || 'N/A'}, ${geo.country || 'N/A'}` : "Unknown",
+    location: geo
+      ? `${geo.city || "N/A"}, ${geo.region || "N/A"}, ${geo.country || "N/A"}`
+      : "Unknown",
     time: new Date().toISOString(),
     path: req.originalUrl,
   });
@@ -33,22 +51,23 @@ app.use((req, res, next) => {
 });
 
 // ================================
-// Configure session
+// Session configuration
 // ================================
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "supersecretkey", // put a strong secret in Render env
+    secret: process.env.SESSION_SECRET || "supersecretkey",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // set to true if you enforce HTTPS
+    cookie: { secure: false }, // set to true if HTTPS
   })
 );
 
-// Example: one admin user (can later pull from DB)
+// ================================
+// Admin user
+// ================================
 const adminUser = {
   username: "admin",
-  // password = "mypassword" (hashed with bcrypt.hashSync("mypassword", 10))
-  passwordHash: bcrypt.hashSync("mypassword", 10)
+  passwordHash: bcrypt.hashSync("mypassword", 10),
 };
 
 // Middleware to protect private routes
@@ -61,7 +80,7 @@ function requireLogin(req, res, next) {
 }
 
 // ================================
-// Public: Login page
+// Login routes
 // ================================
 app.get("/login", (req, res) => {
   res.send(`
@@ -74,7 +93,6 @@ app.get("/login", (req, res) => {
   `);
 });
 
-// Handle login
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -90,7 +108,16 @@ app.post("/login", async (req, res) => {
 });
 
 // ================================
-// Protected dashboard (only for logged-in users)
+// Logout
+// ================================
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
+});
+
+// ================================
+// Protected dashboard (visitor logs)
 // ================================
 app.get("/dashboard", requireLogin, (req, res) => {
   let html = `
@@ -105,8 +132,7 @@ app.get("/dashboard", requireLogin, (req, res) => {
       </tr>
   `;
 
-  // Show last 50 visitors (most recent first)
-  visitorLogs.slice(-50).reverse().forEach(log => {
+  visitorLogs.slice(-50).reverse().forEach((log) => {
     html += `
       <tr>
         <td>${log.ip}</td>
@@ -122,15 +148,87 @@ app.get("/dashboard", requireLogin, (req, res) => {
 });
 
 // ================================
-// Logout
+// Stripe Checkout (original)
 // ================================
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/login");
-  });
+app.post("/create-checkout-session", async (req, res) => {
+  const { items } = req.body;
+  if (!items || items.length === 0)
+    return res.status(400).json({ error: "Cart is empty" });
+
+  try {
+    const line_items = items.map((i) => ({
+      price_data: {
+        currency: "usd",
+        product_data: { name: i.name },
+        unit_amount: Math.round(i.price * 100),
+      },
+      quantity: i.quantity,
+    }));
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items,
+      mode: "payment",
+      success_url: `https://djsdopedesigns.com/download-success.html?products=${items
+        .map((i) => i.id)
+        .join(",")}`,
+      cancel_url: `https://djsdopedesigns.com/cart.html`,
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Stripe checkout failed" });
+  }
 });
 
+// ================================
+// PayPal Checkout (original)
+// ================================
+app.post("/capture-paypal-order", async (req, res) => {
+  const { orderID } = req.body;
+
+  try {
+    const auth = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization:
+          "Basic " +
+          Buffer.from(
+            process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+          ).toString("base64"),
+      },
+      body: "grant_type=client_credentials",
+    });
+    const authData = await auth.json();
+
+    const capture = await fetch(
+      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.access_token}`,
+        },
+      }
+    );
+    const data = await capture.json();
+
+    if (data.status === "COMPLETED") {
+      res.json({ success: true });
+    } else {
+      res.status(400).json({ success: false, details: data });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// ================================
 // Start server
+// ================================
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
