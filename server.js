@@ -3,9 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from "stripe";
 import cors from "cors";
-import fetch from "node-fetch"; // ✅ For PayPal API calls
-
-// Load environment variables
+import basicAuth from "basic-auth"; // ✅ for admin login
+// ❌ removed "node-fetch" – Node 22+ has fetch built in
 import "dotenv/config";
 
 const app = express();
@@ -30,6 +29,65 @@ app.use(express.static(__dirname));
 
 // JSON parser
 app.use(express.json());
+
+/* ================================
+   VISITOR TRACKING
+================================ */
+const visits = []; // in-memory store (replace with DB if needed)
+
+// helper to get IP
+function getClientIp(req) {
+  const xff = req.headers["x-forwarded-for"];
+  if (xff) return xff.split(",")[0].trim();
+  return req.socket.remoteAddress;
+}
+
+// middleware: log each visit
+app.use(async (req, res, next) => {
+  if (req.path.startsWith("/admin")) return next(); // skip admin route logging
+
+  try {
+    const ip = getClientIp(req);
+    const apiUrl = `https://ipapi.co/${encodeURIComponent(ip)}/json/`;
+    const r = await fetch(apiUrl);
+    const geo = await r.json().catch(() => ({}));
+
+    const entry = {
+      ip,
+      country: geo.country_name || geo.country || null,
+      region: geo.region || null,
+      city: geo.city || null,
+      org: geo.org || null,
+      timestamp: new Date().toISOString(),
+    };
+
+    visits.unshift(entry);
+    if (visits.length > 200) visits.pop(); // keep last 200
+    console.log("Visit:", entry);
+  } catch (err) {
+    console.error("Geo lookup failed:", err);
+  }
+
+  next();
+});
+
+// basic auth middleware
+function requireAdmin(req, res, next) {
+  const user = basicAuth(req);
+  const ADMIN_USER = process.env.ADMIN_USER || "admin";
+  const ADMIN_PASS = process.env.ADMIN_PASS || "changeme";
+
+  if (!user || user.name !== ADMIN_USER || user.pass !== ADMIN_PASS) {
+    res.setHeader("WWW-Authenticate", 'Basic realm="Admin"');
+    return res.status(401).send("Authentication required");
+  }
+  next();
+}
+
+// admin view
+app.get("/admin/visitors", requireAdmin, (req, res) => {
+  res.json(visits);
+});
 
 /* ================================
    STRIPE CHECKOUT
@@ -68,8 +126,6 @@ app.post("/create-checkout-session", async (req, res) => {
 /* ================================
    PAYPAL CHECKOUT
 ================================ */
-
-// Step 1: Capture PayPal order
 app.post("/capture-paypal-order", async (req, res) => {
   const { orderID } = req.body;
 
