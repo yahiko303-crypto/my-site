@@ -7,6 +7,8 @@ import geoip from "geoip-lite"; // ✅ Added for IP/location logging
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('trust proxy', true);
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
