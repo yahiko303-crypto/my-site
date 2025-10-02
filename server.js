@@ -1,203 +1,134 @@
 import express from "express";
+import session from "express-session";
+import bcrypt from "bcrypt";
 import path from "path";
-import { fileURLToPath } from "url";
-import Stripe from "stripe";
-import cors from "cors";
-import basicAuth from "basic-auth"; // ✅ for admin login
-// ❌ removed "node-fetch" – Node 22+ has fetch built in
-import "dotenv/config";
+import geoip from "geoip-lite"; // ✅ Added for IP/location logging
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 3000;
 
-// Stripe setup
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2022-11-15" });
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Helper for __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// ================================
+// Visitor logging middleware
+// ================================
+const visitorLogs = [];
 
-// Enable CORS
+app.use((req, res, next) => {
+  const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const geo = geoip.lookup(clientIp);
+
+  visitorLogs.push({
+    ip: clientIp,
+    location: geo ? `${geo.city || 'N/A'}, ${geo.region || 'N/A'}, ${geo.country || 'N/A'}` : "Unknown",
+    time: new Date().toISOString(),
+    path: req.originalUrl,
+  });
+
+  next();
+});
+
+// ================================
+// Configure session
+// ================================
 app.use(
-  cors({
-    origin: "https://djsdopedesigns.com",
+  session({
+    secret: process.env.SESSION_SECRET || "supersecretkey", // put a strong secret in Render env
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // set to true if you enforce HTTPS
   })
 );
 
-// Serve static files
-app.use(express.static(__dirname));
+// Example: one admin user (can later pull from DB)
+const adminUser = {
+  username: "admin",
+  // password = "mypassword" (hashed with bcrypt.hashSync("mypassword", 10))
+  passwordHash: bcrypt.hashSync("mypassword", 10)
+};
 
-// JSON parser
-app.use(express.json());
-
-/* ================================
-   VISITOR TRACKING
-================================ */
-const visits = []; // in-memory store (replace with DB if needed)
-
-// helper to get IP
-function getClientIp(req) {
-  const xff = req.headers["x-forwarded-for"];
-  if (xff) return xff.split(",")[0].trim();
-  return req.socket.remoteAddress;
+// Middleware to protect private routes
+function requireLogin(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect("/login");
+  }
 }
 
-// middleware: log each visit
-app.use(async (req, res, next) => {
-  if (req.path.startsWith("/admin")) return next(); // skip admin route logging
-
-  try {
-    const ip = getClientIp(req);
-    const apiUrl = `https://ipapi.co/${encodeURIComponent(ip)}/json/`;
-    const r = await fetch(apiUrl);
-    const geo = await r.json().catch(() => ({}));
-
-    const entry = {
-      ip,
-      country: geo.country_name || geo.country || null,
-      region: geo.region || null,
-      city: geo.city || null,
-      org: geo.org || null,
-      timestamp: new Date().toISOString(),
-    };
-
-    visits.unshift(entry);
-    if (visits.length > 200) visits.pop(); // keep last 200
-    console.log("Visit:", entry);
-  } catch (err) {
-    console.error("Geo lookup failed:", err);
-  }
-
-  next();
+// ================================
+// Public: Login page
+// ================================
+app.get("/login", (req, res) => {
+  res.send(`
+    <h2>Login</h2>
+    <form method="post" action="/login">
+      <input type="text" name="username" placeholder="Username" required /><br/>
+      <input type="password" name="password" placeholder="Password" required /><br/>
+      <button type="submit">Login</button>
+    </form>
+  `);
 });
 
-// basic auth middleware
-function requireAdmin(req, res, next) {
-  const user = basicAuth(req);
-  const ADMIN_USER = process.env.ADMIN_USER || "admin";
-  const ADMIN_PASS = process.env.ADMIN_PASS || "changeme";
+// Handle login
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
 
-  if (!user || user.name !== ADMIN_USER || user.pass !== ADMIN_PASS) {
-    res.setHeader("WWW-Authenticate", 'Basic realm="Admin"');
-    return res.status(401).send("Authentication required");
-  }
-  next();
-}
-
-// admin view
-app.get("/admin/visitors", requireAdmin, (req, res) => {
-  res.json(visits);
-});
-
-/* ================================
-   STRIPE CHECKOUT
-================================ */
-app.post("/create-checkout-session", async (req, res) => {
-  const { items } = req.body;
-  if (!items || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
-
-  try {
-    const line_items = items.map((i) => ({
-      price_data: {
-        currency: "usd",
-        product_data: { name: i.name },
-        unit_amount: Math.round(i.price * 100),
-      },
-      quantity: i.quantity,
-    }));
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items,
-      mode: "payment",
-      success_url: `https://djsdopedesigns.com/download-success.html?products=${items
-        .map((i) => i.id)
-        .join(",")}`,
-      cancel_url: `https://djsdopedesigns.com/cart.html`,
-    });
-
-    res.json({ url: session.url });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Stripe checkout failed" });
+  if (
+    username === adminUser.username &&
+    (await bcrypt.compare(password, adminUser.passwordHash))
+  ) {
+    req.session.user = { username };
+    res.redirect("/dashboard");
+  } else {
+    res.send("Invalid credentials. <a href='/login'>Try again</a>");
   }
 });
 
-/* ================================
-   PAYPAL CHECKOUT
-================================ */
-app.post("/capture-paypal-order", async (req, res) => {
-  const { orderID } = req.body;
+// ================================
+// Protected dashboard (only for logged-in users)
+// ================================
+app.get("/dashboard", requireLogin, (req, res) => {
+  let html = `
+    <h2>Welcome, ${req.session.user.username}</h2>
+    <p>Visitor Logs:</p>
+    <table border="1" cellpadding="5">
+      <tr>
+        <th>IP</th>
+        <th>Location</th>
+        <th>Time</th>
+        <th>Page</th>
+      </tr>
+  `;
 
-  try {
-    // Get access token from PayPal
-    const auth = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization:
-          "Basic " +
-          Buffer.from(
-            process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
-          ).toString("base64"),
-      },
-      body: "grant_type=client_credentials",
-    });
-    const authData = await auth.json();
+  // Show last 50 visitors (most recent first)
+  visitorLogs.slice(-50).reverse().forEach(log => {
+    html += `
+      <tr>
+        <td>${log.ip}</td>
+        <td>${log.location}</td>
+        <td>${log.time}</td>
+        <td>${log.path}</td>
+      </tr>
+    `;
+  });
 
-    // Capture order
-    const capture = await fetch(
-      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authData.access_token}`,
-        },
-      }
-    );
-    const data = await capture.json();
-
-    if (data.status === "COMPLETED") {
-      res.json({ success: true });
-    } else {
-      res.status(400).json({ success: false, details: data });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false });
-  }
+  html += "</table><a href='/logout'>Logout</a>";
+  res.send(html);
 });
 
-/* ================================
-   FILE DOWNLOADS
-================================ */
-app.get("/download/:productId", (req, res) => {
-  const productId = req.params.productId;
-
-  const files = {
-    "1": "drake-dancing.zip",
-    "2": "hammer-girl.zip",
-    "3": "dancing-guy.zip",
-    "4": "green-dancer.zip",
-    "5": "death-drummer.zip",
-    "6": "dancing-banana.zip",
-    "7": "ceramic-mug.zip",
-    "8": "leather-wallet.zip",
-    "9": "heart-emote.zip",
-  };
-
-  const fileName = files[productId];
-  if (!fileName) return res.status(404).send("File not found");
-
-  const filePath = path.join(__dirname, "digital", fileName);
-  res.download(filePath, fileName, (err) => {
-    if (err) {
-      console.error("Download error:", err);
-      res.status(500).send("Error downloading file");
-    }
+// ================================
+// Logout
+// ================================
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/login");
   });
 });
 
 // Start server
-app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
