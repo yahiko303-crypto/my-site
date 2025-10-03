@@ -32,6 +32,17 @@ app.use(express.static(__dirname));
 app.use(express.json());
 
 /* ================================
+   TEMP ROUTE: Check Stripe key
+   (Safe for testing, remove after verification)
+================================ */
+app.get("/test-stripe-key", (req, res) => {
+  // ✅ Only show last 4 chars of key for safety
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return res.send("Stripe key not found!");
+  res.send(`Stripe key loaded: **** **** **** ${key.slice(-4)}`);
+});
+
+/* ================================
    STRIPE CHECKOUT
 ================================ */
 app.post("/create-checkout-session", async (req, res) => {
@@ -68,8 +79,6 @@ app.post("/create-checkout-session", async (req, res) => {
 /* ================================
    PAYPAL CHECKOUT
 ================================ */
-
-// Step 1: Capture PayPal order
 app.post("/capture-paypal-order", async (req, res) => {
   const { orderID } = req.body;
 
